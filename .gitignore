@@ -1,3 +1,11 @@
+# Projectfiles#
+###############
+target
+project/boot
+project/target
+project/plugins/target
+
+
 # Compiled source #
 ###################
 *.com
