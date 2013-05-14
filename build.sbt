@@ -18,7 +18,7 @@ seq(LiquibasePlugin.liquibaseSettings: _*)
 
 liquibaseUsername := "clocking"
 
-liquibasePassword := {sys.env("ENV")}
+liquibasePassword := {System.getenv("ENV")}
 
 liquibaseDriver   := "org.postgresql.Driver"
 
