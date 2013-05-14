@@ -9,7 +9,7 @@ object NbrnoBuild extends Build {
   lazy val root = Project(id = "nbrno",
     base = file("."),
     settings = Project.defaultSettings ++ liquibaseSettings ++
-      Seq(environment := System.getenv("ENV")) ++
+      //Seq(environment := System.getenv("ENV")) ++
 
       Seq(liquibaseUsername := "clocking",
       liquibasePassword := "clocking",
