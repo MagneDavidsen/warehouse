@@ -22,6 +22,6 @@ liquibasePassword := "clocking"
 
 liquibaseDriver   := "org.postgresql.Driver"
 
-liquibaseUrl      := "jdbc:postgresql://localhost:5432/nbrno"
+liquibaseUrl      := {if(sys.env("ENV")=="prod") sys.env("DATABASE_URL") else "jdbc:postgresql://localhost:5432/nbrno"}
 
 liquibaseChangelog := "src/main/migrations/changelog.sql"
