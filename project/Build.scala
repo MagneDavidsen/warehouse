@@ -14,8 +14,8 @@ object NbrnoBuild extends Build {
     settings = Project.defaultSettings ++ liquibaseSettings ++
       Seq(environment := realenv)++
 
-      Seq(liquibaseUsername := "clocking",
-      liquibasePassword := "clocking",
+      Seq(liquibaseUsername := Properties.envOrElse("DB_USER", "clocking"),
+      liquibasePassword := Properties.envOrElse("DB_PASSWORD", "clocking"),
       liquibaseDriver := "org.postgresql.Driver",
       liquibaseUrl := "jdbc:postgresql://localhost:5432/nbrno",
       liquibaseChangelog := "src/main/migrations/changelog.sql")
