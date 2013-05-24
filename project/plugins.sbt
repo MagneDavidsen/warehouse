@@ -1,6 +1,6 @@
 resolvers += Classpaths.typesafeResolver
 
-resolvers += "bigtoast-github" at "http://bigtoast.github.com/repo/"
+resolvers += "magnedavidsen-github" at "http://magnedavidsen.github.com/repo/"
 
 addSbtPlugin("com.typesafe.startscript" % "xsbt-start-script-plugin" % "0.5.3")
 

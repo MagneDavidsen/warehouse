@@ -1,12 +1,13 @@
 import sbt._
 import Keys._
 import com.github.bigtoast.sbtliquibase.LiquibasePlugin._
+import scala.util.Properties
 
 object NbrnoBuild extends Build {
 
-  val realenv : String = System.getenv("ENV")
+  lazy val realenv : String = Properties.envOrElse("ENV", "UNKNOWN")
 
-  val environment = SettingKey[String]("environment", "environment variable")
+  lazy val environment = SettingKey[String]("environment", "environment variable")
 
   lazy val root = Project(id = "nbrno",
     base = file("."),
