@@ -12,7 +12,7 @@ object Web {
 
 
 
-    val port = Properties.envOrElse("PORT", "80").toInt
+    val port = Properties.envOrElse("PORT", "8080").toInt
     println("Starting on port:"+port)
     ServerBuilder()
       .codec(Http())
