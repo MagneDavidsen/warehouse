@@ -1,20 +1,21 @@
 --liquibase formatted sql
 
 --changeset magne:1
-create table users (
-    id int primary key,
-    name varchar(255)
+CREATE TABLE users (
+  id       SERIAL PRIMARY KEY,
+  username VARCHAR(255),
+  email    VARCHAR(255),
+  passhash VARCHAR(255)
 );
 
---changeset magne:2
-create table rappers (
-  id int primary key,
-  name varchar(255)
+CREATE TABLE rappers (
+  id   SERIAL PRIMARY KEY,
+  name VARCHAR(255)
 );
 
-create table ratings (
-  id int primary key,
-  user_id int references users (id),
-  rapper_id int references rappers (id),
-  rating int
+CREATE TABLE ratings (
+  id        SERIAL PRIMARY KEY,
+  user_id   INT REFERENCES users (id),
+  rapper_id INT REFERENCES rappers (id),
+  rating    INT
 );

@@ -27,3 +27,7 @@ libraryDependencies += "net.databinder" %% "unfiltered-jetty" % "0.6.8"
 libraryDependencies += "com.typesafe.slick" %% "slick" % "1.0.1-RC1"
 
 libraryDependencies <+= (scalaVersion)("org.scala-lang" % "scala-compiler" % _)
+
+libraryDependencies += "com.lambdaworks" % "scrypt" % "1.4.0"
+
+libraryDependencies += "org.json4s" %% "json4s-native" % "3.2.4"
