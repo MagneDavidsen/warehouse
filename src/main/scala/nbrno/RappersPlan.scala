@@ -4,10 +4,12 @@ import unfiltered.filter.Plan
 import unfiltered.request.Path
 import unfiltered.response.ResponseString
 
-object Rappers extends Plan {
-  def intent: Plan.Intent = {
+object RappersPlan extends Plan {
+
+  def intent = {
     case Path("/") => {
-      ResponseString("Hello World")
+      ResponseString(DatabaseHandler.getRappers)
     }
   }
 }
+
