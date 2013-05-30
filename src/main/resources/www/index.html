@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="nbrno" >
 <head>
     <meta charset="utf-8">
     <title>norgesbesterapper.no</title>
@@ -29,7 +29,7 @@
     </div>
     <!-- /demo-headline -->
 
-    <div class="rapperList" ng-app="rapper" ng-controller="RapperListCtrl">
+    <div class="rapperList"  ng-controller="RapperListCtrl">
         <div class="row demo-row" ng-repeat="rapper in rappers">
             <div class="span1">
                 <a href="#fakelink" class="btn btn-block btn-large">#{{rapper.id}}</a>
@@ -49,20 +49,41 @@
 
 
 
-    <div class="row demo-row">
-        <div class="span login-form">
+    <div class="row demo-row" ng-controller="LoginCtrl">
+        <div class="span5 login-form">
             <div class="control-group">
-                <input type="text" class="login-field" value="" placeholder="Enter your name" id="login-name">
+                <input type="text" class="login-field" value="" placeholder="Brukernavn" id="login-name" ng-model="loginUser">
                 <label class="login-field-icon fui-user" for="login-name"></label>
             </div>
 
             <div class="control-group">
-                <input type="password" class="login-field" value="" placeholder="Password" id="login-pass">
+                <input type="password" class="login-field" value="" placeholder="Passord" id="login-pass" ng-model="loginPassword">
                 <label class="login-field-icon fui-lock" for="login-pass"></label>
             </div>
 
-            <a class="btn btn-primary btn-large btn-block" href="#">Login</a>
-            <a class="login-link" href="#">Lost your password?</a>
+            <a class="btn btn-primary btn-large btn-block" href="" ng-click="login()">Logg inn</a>
+            <a class="login-link" href="#">Glemt passord?</a>
+            <span></span>
+        </div>
+
+        <div class="span5 login-form">
+            <div class="control-group">
+                <input type="text" class="login-field" value="" placeholder="Brukernavn" id="signup-name" ng-model="signupUser">
+                <label class="login-field-icon fui-user" for="login-name"></label>
+            </div>
+
+            <div class="control-group">
+                <input type="text" class="login-field" value="" placeholder="E-post (valgfritt)" id="signup-email" ng-model="signupEmail">
+                <label class="login-field-icon fui-mail" for="login-name"></label>
+            </div>
+
+            <div class="control-group">
+                <input type="password" class="login-field" value="" placeholder="Passord" id="signup-pass" ng-model="signupPassword">
+                <label class="login-field-icon fui-lock" for="login-pass"></label>
+            </div>
+
+            <a class="btn btn-primary btn-large btn-block" href="" ng-click="signup()">Lag ny konto</a>
+
             <span></span>
         </div>
         </div>
@@ -73,8 +94,8 @@
 
 
 <!-- Load JS here for greater good =============================-->
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular-resource.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular-resource.js"></script>
 <script src="js/jquery-1.8.3.min.js"></script>
 <script src="js/jquery-ui-1.10.3.custom.min.js"></script>
 <script src="js/jquery.ui.touch-punch.min.js"></script>

@@ -27,7 +27,7 @@ object SignupPlan extends Plan {
 
     case req @ Path("/api/signup") => req match {
       case POST(_) => req match {
-        case RequestContentType("application/json") => req match {
+        case RequestContentType("application/json;charset=UTF-8") => req match {
           case Accepts.Json(_) =>
             Ok ~> JsonContent ~>{
               val user : SignupUser = read[SignupUser](Body.string(req))
@@ -46,7 +46,7 @@ object SignupPlan extends Plan {
 
     case req @ Path("/api/login") => req match {
       case POST(_) => req match {
-        case RequestContentType("application/json") => req match {
+        case RequestContentType("application/json;charset=UTF-8") => req match {
           case Accepts.Json(_) =>
             Ok ~> JsonContent ~>{
               val user : SignupUser = read[SignupUser](Body.string(req))

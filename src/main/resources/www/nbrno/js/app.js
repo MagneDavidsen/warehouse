@@ -2,7 +2,8 @@
 
 /* App Module */
 
-angular.module('rapper', ['rapperServices']).
+angular.module('nbrno', ['rapperServices', 'loginServices', 'signupServices']).
   config(['$routeProvider', function($routeProvider) {
 
 }]);
+

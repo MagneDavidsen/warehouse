@@ -3495,7 +3495,7 @@ body.vjs-full-window {
   padding-bottom: 11px;
   padding-top: 11px;
   text-indent: 3px;
-  width: 299px;
+  width: 96%;
   margin-bottom: 10px !important;
 }
 .login-form .login-field:focus + .login-field-icon {
