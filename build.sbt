@@ -18,6 +18,11 @@ resolvers += "jboss repo" at "http://repository.jboss.org/nexus/content/groups/p
 
 classpathTypes ~= (_ + "orbit")
 
+libraryDependencies ++= Seq(
+  "org.eclipse.jetty.orbit" % "javax.servlet" % "3.0.0.v201112011016" % "container"         artifacts (Artifact("javax.servlet", "jar", "jar")
+  )
+)
+
 libraryDependencies += "postgresql" % "postgresql" % "9.1-901.jdbc4"
 
 libraryDependencies += "net.databinder" %% "unfiltered-filter" % "0.6.8"
