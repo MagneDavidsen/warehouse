@@ -8,11 +8,9 @@ scalaVersion :="2.10.1"
 
 version :="0.1"
 
-resolvers += "twitter-repo" at "http://maven.twttr.com"
-
 resolvers += "coda" at "http://repo.codahale.com"
 
-resolvers += "sonatype-repo" at "https://oss.sonatype.org"
+resolvers += "sonatype-repo" at "http://oss.sonatype.org"
 
 resolvers += "maven-repo" at "http://search.maven.org"
 
@@ -20,7 +18,7 @@ resolvers += "jboss repo" at "http://repository.jboss.org/nexus/content/groups/p
 
 classpathTypes ~= (_ + "orbit")
 
-libraryDependencies ++= Seq("com.twitter" % "finagle-core" % "1.9.0", "com.twitter" % "finagle-http" % "1.9.0", "postgresql" % "postgresql" % "9.1-901.jdbc4")
+libraryDependencies += "postgresql" % "postgresql" % "9.1-901.jdbc4"
 
 libraryDependencies += "net.databinder" %% "unfiltered-filter" % "0.6.8"
 
