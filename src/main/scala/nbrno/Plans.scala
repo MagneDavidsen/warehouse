@@ -8,6 +8,7 @@ import org.json4s.DefaultFormats
 import org.json4s.native.Serialization.{read, write}
 import unfiltered.response.ResponseString
 import org.slf4j.impl.StaticLoggerBinder
+import unfiltered.Cookie
 
 object RappersPlan extends Plan {
   implicit val formats = DefaultFormats
@@ -50,12 +51,20 @@ object SignupPlan extends Plan {
           case Accepts.Json(_) =>
             Ok ~> JsonContent ~>{
               val user : SignupUser = read[SignupUser](Body.string(req))
-              if(DatabaseHandler.validateUser(user.username, user.password)) Ok
+              if(DatabaseHandler.validateUser(user.username, user.password)) Ok ~> SetCookies(Cookie("SESSION_COOKIE", user.username))
               else Unauthorized ~> ResponseString("Wrong username or password")
             }
           case _ => NotAcceptable
         }
         case _ => UnsupportedMediaType
+      }
+      case _ => MethodNotAllowed
+    }
+
+    case req @ Path("/api/cookies") => req match {
+      case GET(_) & Cookies(cookies) => {
+      val s : String = cookies("SESSION_COOKIE").get.value
+      ResponseString(s)
       }
       case _ => MethodNotAllowed
     }
