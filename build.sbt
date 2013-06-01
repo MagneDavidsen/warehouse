@@ -16,7 +16,13 @@ resolvers += "maven-repo" at "http://search.maven.org"
 
 resolvers += "jboss repo" at "http://repository.jboss.org/nexus/content/groups/public-jboss/"
 
-classpathTypes ~= (_ + "orbit")
+classpathTypes += "orbit"
+
+libraryDependencies ++= Seq(
+  "org.eclipse.jetty.orbit" % "javax.servlet" % "2.5.0.v201103041518" artifacts (
+    Artifact("javax.servlet", "jar", "jar")
+  )
+)
 
 libraryDependencies += "postgresql" % "postgresql" % "9.1-901.jdbc4"
 
