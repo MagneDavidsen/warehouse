@@ -18,11 +18,6 @@ resolvers += "jboss repo" at "http://repository.jboss.org/nexus/content/groups/p
 
 classpathTypes ~= (_ + "orbit")
 
-libraryDependencies ++= Seq(
-  "org.eclipse.jetty.orbit" % "javax.servlet" % "3.0.0.v201112011016" % "container"         artifacts (Artifact("javax.servlet", "jar", "jar")
-  )
-)
-
 libraryDependencies += "postgresql" % "postgresql" % "9.1-901.jdbc4"
 
 libraryDependencies += "net.databinder" %% "unfiltered-filter" % "0.6.8"
@@ -38,5 +33,7 @@ libraryDependencies <+= (scalaVersion)("org.scala-lang" % "scala-compiler" % _)
 libraryDependencies += "com.lambdaworks" % "scrypt" % "1.4.0"
 
 libraryDependencies += "org.json4s" %% "json4s-native" % "3.2.4"
+
+libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.5"
 
 libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.13"
