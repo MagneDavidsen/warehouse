@@ -26,15 +26,16 @@ object SignupPlan extends Plan {
 
   def intent = {
 
-    case req @ Path("/api/signup") => req match {
+    case req@Path("/api/signup") => req match {
       case POST(_) => req match {
         case RequestContentType("application/json;charset=UTF-8") => req match {
           case Accepts.Json(_) =>
-            Ok ~> JsonContent ~>{
-              val user : SignupUser = read[SignupUser](Body.string(req))
-              if(DatabaseHandler.availableUsername(user.username)){
-                val newUser = DatabaseHandler.createUser(user.username, "", user.password)
-                ResponseString(write(newUser))
+            Ok ~> JsonContent ~> {
+              val user: SignupUser = read[SignupUser](Body.string(req))
+              if (DatabaseHandler.availableUsername(user.username)) {
+                DatabaseHandler.createUser(user.username, "", user.password)
+                val sessionId : String = nbrno.Server.addUsernameToSessionStore(user.username)
+                Ok ~> SetCookies(Cookie("SESSION_ID", sessionId))
               }
               else BadRequest ~> ResponseString("Username not available")
             }
@@ -45,13 +46,16 @@ object SignupPlan extends Plan {
       case _ => MethodNotAllowed
     }
 
-    case req @ Path("/api/login") => req match {
+    case req@Path("/api/login") => req match {
       case POST(_) => req match {
         case RequestContentType("application/json;charset=UTF-8") => req match {
           case Accepts.Json(_) =>
-            Ok ~> JsonContent ~>{
-              val user : SignupUser = read[SignupUser](Body.string(req))
-              if(DatabaseHandler.validateUser(user.username, user.password)) Ok ~> SetCookies(Cookie("SESSION_COOKIE", user.username))
+            Ok ~> JsonContent ~> {
+              val user: SignupUser = read[SignupUser](Body.string(req))
+              if (DatabaseHandler.validateUser(user.username, user.password)) {
+                val sessionId : String = nbrno.Server.addUsernameToSessionStore(user.username)
+                Ok ~> SetCookies(Cookie("SESSION_ID", sessionId))
+              }
               else Unauthorized ~> ResponseString("Wrong username or password")
             }
           case _ => NotAcceptable
@@ -61,10 +65,10 @@ object SignupPlan extends Plan {
       case _ => MethodNotAllowed
     }
 
-    case req @ Path("/api/cookies") => req match {
+    case req@Path("/api/cookies") => req match {
       case GET(_) & Cookies(cookies) => {
-      val s : String = cookies("SESSION_COOKIE").get.value
-      ResponseString(s)
+        val s: String = cookies("SESSION_ID").get.value
+        ResponseString(s)
       }
       case _ => MethodNotAllowed
     }
