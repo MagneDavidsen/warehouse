@@ -25,7 +25,6 @@ object RappersPlan extends Plan {
           case Accepts.Json(_) =>
             Ok ~> JsonContent ~> {
               ResponseString("id:" ++ id)
-
             }
           case _ => NotAcceptable
         }
@@ -52,8 +51,8 @@ object SignupPlan extends Plan {
             Ok ~> JsonContent ~> {
               val user: User = read[User](Body.string(req))
               if (DatabaseHandler.availableUsername(user.username)) {
-                DatabaseHandler.createUser(user, req.remoteAddr)
-                val sessionId : String = NbrnoServer.addUsernameToSessionStore(user.username)
+                val newUser : User = DatabaseHandler.createUser(user, req.remoteAddr)
+                val sessionId : String = NbrnoServer.addUserToSessionStore(newUser)
                 Ok ~> SetCookies(Cookie("SESSION_ID", sessionId))
               }
               else BadRequest ~> ResponseString("Username not available")
@@ -73,10 +72,10 @@ object SignupPlan extends Plan {
         case RequestContentType("application/json;charset=UTF-8") => req match {
           case Accepts.Json(_) =>
             Ok ~> JsonContent ~> {
-
               val user: User = read[User](body)
-              if (DatabaseHandler.validateUser(user.username, user.password.get)) {
-                val sessionId : String = NbrnoServer.addUsernameToSessionStore(user.username)
+              val validatedUser = DatabaseHandler.validateUser(user.username, user.password.get)
+              if (validatedUser.isDefined) {
+                val sessionId : String = NbrnoServer.addUserToSessionStore(validatedUser.get)
                 Ok ~> SetCookies(Cookie("SESSION_ID", sessionId))
               }
               else BadRequest ~> ResponseString("Wrong username or password")

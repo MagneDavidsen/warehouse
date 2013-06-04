@@ -100,13 +100,14 @@ object DatabaseHandler {
     }
   }
 
-  def validateUser(username : String, password : String) : Boolean = {
+  def validateUser(username : String, password : String) : Option[User] = {
     Database.forDataSource(dataSource) withSession {
       val query = for{
         u <- Users if u.username === username
       } yield u
       val user : Option[User] = query.firstOption
-      user.isDefined && SCryptUtil.check(password, user.get.passhash.get)
+      if(user.isDefined && SCryptUtil.check(password, user.get.passhash.get)) user
+      else None
     }
   }
 
