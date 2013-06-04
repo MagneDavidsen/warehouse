@@ -39,10 +39,10 @@
                 <a href="#fakelink" class="btn btn-large btn-block btn-info">{{rapper.name}}</a>
             </div>
             <div class="span1">
-                <a href="#fakelink" class="btn btn-large btn-block btn-success">+</a>
+                <a class="btn btn-large btn-block btn-success" ng-click="vote({{rapper.id}}, true)">+</a>
             </div>
             <div class="span1">
-                <a href="#fakelink" class="btn btn-large btn-block btn-danger">-</a>
+                <a class="btn btn-large btn-block btn-danger" ng-click="vote({{rapper.id}}, false)">-</a>
             </div>
         </div>
     </div>

@@ -32,7 +32,7 @@ libraryDependencies += "net.databinder" %% "unfiltered-json" % "0.6.7"
 
 libraryDependencies += "net.databinder" %% "unfiltered-jetty" % "0.6.8"
 
-libraryDependencies += "com.typesafe.slick" %% "slick" % "1.0.1-RC1"
+libraryDependencies += "com.typesafe.slick" %% "slick" % "1.0.1"
 
 libraryDependencies <+= (scalaVersion)("org.scala-lang" % "scala-compiler" % _)
 

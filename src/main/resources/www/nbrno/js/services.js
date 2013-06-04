@@ -19,7 +19,14 @@ var loginService =  angular.module('loginServices', ['ngResource']).
 
 var signupService =  angular.module('signupServices', ['ngResource']).
     factory('Signup', function($resource){
-        return $resource('api/signup', {username: '@username', email: '@email', password: '@password'}, {
+        return $resource('api/signup', {}, {
+            save: {method:'POST', isArray: false  }
+        });
+    });
+
+var voteService =  angular.module('voteServices', ['ngResource']).
+    factory('Vote', function($resource){
+        return $resource('api/rappers/:rapperId/vote', {rapperId: '@rapperId'}, {
             save: {method:'POST', isArray: false  }
         });
     });

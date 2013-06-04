@@ -2,8 +2,13 @@
 
 /* Controllers */
 
-function RapperListCtrl($scope, Rapper) {
+function RapperListCtrl($scope, Rapper, Vote) {
     $scope.rappers = Rapper.query();
+
+    $scope.vote = function (rapperId, voteUp) {
+        Vote.save({
+            rapperId: rapperId, voteUp: voteUp});
+    }
 }
 
 function LoginCtrl($scope, Login, Signup) {

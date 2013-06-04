@@ -113,20 +113,21 @@ object DatabaseHandler {
 
   def vote(userId : Int, rapperId : Int, voteUp : Boolean){
     Database.forDataSource(dataSource) withSession {
+      val points : Int = if(voteUp) 1 else -1
       val query =  for{
         r <- Ratings if(r.user_id === userId && r.rapper_id === rapperId)
       } yield r
       val rating : Option[Rating] = query.firstOption
-      if(rating.isDefined) updateRating(rating.get, voteUp)
-      else createRating(userId, rapperId, voteUp)
+      if(rating.isDefined) updateRating(rating.get, points)
+      else createRating(userId, rapperId, points)
     }
   }
 
-  private def updateRating(rating : Rating, voteUp : Boolean){
-
+  private def updateRating(rating : Rating, points : Int){
+    val q = for { r <- Ratings if r.id === rating.id } yield {r.rating ~ r.updatedAt}
+    q.update(points, now)
   }
 
-  private def createRating(userId : Int, rapperId : Int, voteUp : Boolean) =
-    Ratings.forInsert insert Rating(None, userId, rapperId, -1, now)
-
+  private def createRating(userId : Int, rapperId : Int, points : Int) =
+    Ratings.forInsert insert Rating(None, userId, rapperId, points, now)
 }

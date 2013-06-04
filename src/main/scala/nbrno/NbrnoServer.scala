@@ -10,7 +10,7 @@ import nbrno.domain.User
 object NbrnoServer extends App {
 
     //token is key, username is value
-  var sessionStore : immutable.HashMap[String, User] = new immutable.HashMap[String, User]
+  private var sessionStore : immutable.HashMap[String, User] = new immutable.HashMap[String, User]
 
   def addUserToSessionStore (user : User) : String = {
     val token : String = UUID.randomUUID().toString
