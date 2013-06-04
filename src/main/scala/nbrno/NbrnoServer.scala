@@ -6,13 +6,13 @@ import java.net.URL
 import scala.collection.{immutable}
 import java.util.UUID
 
-object Server extends App {
+object NbrnoServer extends App {
 
     //token is key, username is value
   var sessionStore : immutable.HashMap[String, String] = new immutable.HashMap[String, String]
 
   def addUsernameToSessionStore (username : String) : String = {
-    val token : String = UUID.fromString(username).toString
+    val token : String = UUID.randomUUID().toString
     sessionStore += token  -> username
     token
   }

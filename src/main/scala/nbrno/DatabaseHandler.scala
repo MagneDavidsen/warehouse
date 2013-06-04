@@ -4,7 +4,7 @@ import scala.slick.driver.PostgresDriver.simple._
 import scala.slick.session.Database
 import Database.threadLocalSession
 import scala.slick.lifted.Query
-import nbrno.domain.{Rapper, User}
+import nbrno.domain.{Rating, Rapper, User}
 import com.lambdaworks.crypto.SCryptUtil
 import scala.collection.mutable
 import javax.sql.DataSource
@@ -45,8 +45,6 @@ object DatabaseHandler {
     def toRow(u: User) = Some(u.id, u.username, u.email, u.passhash)
   }
 
-
-
   object Users extends Table[User]("users"){
     def id = columnToOptionColumn(column[Int]("id", O.PrimaryKey, O.AutoInc))
     def username = column[String]("username")
@@ -55,6 +53,22 @@ object DatabaseHandler {
 
     def * = id ~ username ~ email ~ passhash <> (UserObject.fromRow _, UserObject.toRow _)
     def forInsert = username ~ email ~ passhash <> ({ t => User(None, t._1, t._2, t._3)}, { (u: User) => Some((u.username, u.email, u.passhash))})
+  }
+
+  object RatingObject {
+    def fromRow(id : Int, user_id : Int, rapper_id : Int, rating : Int) : Rating = Rating(id, user_id, rapper_id, rating)
+    def toRow(r : Rating) = Some(r.id, r.userId, r.rapperId, r.rating)
+  }
+
+  object Ratings extends Table[Rating]("ratings"){
+    def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
+    def user_id = column[Int]("user_id")
+    def rapper_id = column[Int]("rapper_id")
+    def rating = column[Int]("rating")
+
+    def * = id ~ user_id ~rapper_id ~ rating <> (RatingObject.fromRow _, RatingObject.toRow _)
+    def forInsert = user_id ~ rapper_id ~ rating
+
   }
 
   def getRappers: List[Rapper] = {
@@ -89,6 +103,17 @@ object DatabaseHandler {
       } yield u
       val user : Option[User] = query.firstOption
       user.isDefined && SCryptUtil.check(password, user.get.passhash.get)
+    }
   }
- }
+
+  def vote(userId : Int, rapperId : Int, voteUp : Boolean){
+    Database.forDataSource(dataSource) withSession {
+      val query =  for{
+        r <- Ratings if(r.user_id === userId && r.rapper_id === rapperId)
+      } yield r
+      val rating : Option[Rating] = query.firstOption
+      rating
+    }
+  }
+
 }

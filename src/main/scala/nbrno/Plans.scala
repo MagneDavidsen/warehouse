@@ -14,8 +14,23 @@ object RappersPlan extends Plan {
   implicit val formats = DefaultFormats
 
   def intent = {
-    case GET(_) & Path("/api/rappers") => {
+    case GET(_) & Path("/api/rappers")  => {
       ResponseString(write(DatabaseHandler.getRappers))
+    }
+
+    case req@Path(Seg("api" ::"rappers" :: id :: "vote" :: Nil)) => req match {
+      case POST(_) & Cookies(cookies) => req match {
+        case RequestContentType("application/json;charset=UTF-8") => req match {
+          case Accepts.Json(_) =>
+            Ok ~> JsonContent ~> {
+              ResponseString("id:" ++ id)
+
+            }
+          case _ => NotAcceptable
+        }
+        case _ => UnsupportedMediaType
+      }
+      case _ => MethodNotAllowed
     }
   }
 }
@@ -34,7 +49,7 @@ object SignupPlan extends Plan {
               val user: SignupUser = read[SignupUser](Body.string(req))
               if (DatabaseHandler.availableUsername(user.username)) {
                 DatabaseHandler.createUser(user.username, "", user.password)
-                val sessionId : String = nbrno.Server.addUsernameToSessionStore(user.username)
+                val sessionId : String = NbrnoServer.addUsernameToSessionStore(user.username)
                 Ok ~> SetCookies(Cookie("SESSION_ID", sessionId))
               }
               else BadRequest ~> ResponseString("Username not available")
@@ -53,10 +68,10 @@ object SignupPlan extends Plan {
             Ok ~> JsonContent ~> {
               val user: SignupUser = read[SignupUser](Body.string(req))
               if (DatabaseHandler.validateUser(user.username, user.password)) {
-                val sessionId : String = nbrno.Server.addUsernameToSessionStore(user.username)
+                val sessionId : String = NbrnoServer.addUsernameToSessionStore(user.username)
                 Ok ~> SetCookies(Cookie("SESSION_ID", sessionId))
               }
-              else Unauthorized ~> ResponseString("Wrong username or password")
+              else BadRequest ~> ResponseString("Wrong username or password")
             }
           case _ => NotAcceptable
         }
@@ -68,7 +83,7 @@ object SignupPlan extends Plan {
     case req@Path("/api/cookies") => req match {
       case GET(_) & Cookies(cookies) => {
         val s: String = cookies("SESSION_ID").get.value
-        ResponseString(s)
+        ResponseString(s ++ ", ip: " ++ req.remoteAddr)
       }
       case _ => MethodNotAllowed
     }
