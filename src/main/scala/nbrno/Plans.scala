@@ -7,11 +7,12 @@ import nbrno.domain.User
 import org.json4s.DefaultFormats
 import org.json4s.native.Serialization.{read, write}
 import unfiltered.response.ResponseString
-import org.slf4j.impl.StaticLoggerBinder
+import org.slf4j.{LoggerFactory, Logger}
 import unfiltered.Cookie
 
 object RappersPlan extends Plan {
   implicit val formats = DefaultFormats
+  val logger : Logger = LoggerFactory.getLogger("nbrno.RappersPlan")
 
   def intent = {
     case GET(_) & Path("/api/rappers")  => {
@@ -38,10 +39,13 @@ object RappersPlan extends Plan {
 
 object SignupPlan extends Plan {
   implicit val formats = DefaultFormats
+  val logger : Logger = LoggerFactory.getLogger("nbrno.SignupPlan")
 
   def intent = {
 
-    case req@Path("/api/signup") => req match {
+    case req@Path("/api/signup") =>
+      logger.debug(Body.string(req))
+      req match {
       case POST(_) => req match {
         case RequestContentType("application/json;charset=UTF-8") => req match {
           case Accepts.Json(_) =>
@@ -61,12 +65,16 @@ object SignupPlan extends Plan {
       case _ => MethodNotAllowed
     }
 
-    case req@Path("/api/login") => req match {
+    case req@Path("/api/login") =>
+      val body : String = Body.string(req)
+      logger.info("RequestBody: " ++ body)
+      req match {
       case POST(_) => req match {
         case RequestContentType("application/json;charset=UTF-8") => req match {
           case Accepts.Json(_) =>
             Ok ~> JsonContent ~> {
-              val user: User = read[User](Body.string(req))
+
+              val user: User = read[User](body)
               if (DatabaseHandler.validateUser(user.username, user.password.get)) {
                 val sessionId : String = NbrnoServer.addUsernameToSessionStore(user.username)
                 Ok ~> SetCookies(Cookie("SESSION_ID", sessionId))

@@ -12,7 +12,7 @@ var rapperServiceModule = angular.module('rapperServices', ['ngResource']).
 
 var loginService =  angular.module('loginServices', ['ngResource']).
     factory('Login', function($resource){
-        return $resource('api/login', {username: '@username', password: '@password'}, {
+        return $resource('api/login', {}, {
             save: {method:'POST', isArray: false  }
         });
     });
