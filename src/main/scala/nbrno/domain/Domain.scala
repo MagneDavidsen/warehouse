@@ -1,6 +1,8 @@
 package nbrno.domain
 
-case class SignupUser(username:String, password:String)
-case class User(id:Option[Int], username:String, email:String, passhash:Option[String])
-case class Rapper(id:Option[Int], name:String)
-case class Rating(id:Int, userId:Int, rapperId:Int, rating:Int)
+import java.sql.Timestamp
+
+case class User(id:Option[Int], username:String, email:String, password:Option[String],
+                passhash:Option[String], createdFromIp:Option[String], createdAt:Option[Timestamp])
+case class Rapper(id:Int, name:String, createdAt:Timestamp)
+case class Rating(id:Int, userId:Int, rapperId:Int, rating:Int, updatedAt:Timestamp)

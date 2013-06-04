@@ -3,7 +3,7 @@ package nbrno
 import unfiltered.filter.Plan
 import unfiltered.request._
 import unfiltered.response._
-import nbrno.domain.{SignupUser, User}
+import nbrno.domain.User
 import org.json4s.DefaultFormats
 import org.json4s.native.Serialization.{read, write}
 import unfiltered.response.ResponseString
@@ -46,9 +46,9 @@ object SignupPlan extends Plan {
         case RequestContentType("application/json;charset=UTF-8") => req match {
           case Accepts.Json(_) =>
             Ok ~> JsonContent ~> {
-              val user: SignupUser = read[SignupUser](Body.string(req))
+              val user: User = read[User](Body.string(req))
               if (DatabaseHandler.availableUsername(user.username)) {
-                DatabaseHandler.createUser(user.username, "", user.password)
+                DatabaseHandler.createUser(user, req.remoteAddr)
                 val sessionId : String = NbrnoServer.addUsernameToSessionStore(user.username)
                 Ok ~> SetCookies(Cookie("SESSION_ID", sessionId))
               }
@@ -66,8 +66,8 @@ object SignupPlan extends Plan {
         case RequestContentType("application/json;charset=UTF-8") => req match {
           case Accepts.Json(_) =>
             Ok ~> JsonContent ~> {
-              val user: SignupUser = read[SignupUser](Body.string(req))
-              if (DatabaseHandler.validateUser(user.username, user.password)) {
+              val user: User = read[User](Body.string(req))
+              if (DatabaseHandler.validateUser(user.username, user.password.get)) {
                 val sessionId : String = NbrnoServer.addUsernameToSessionStore(user.username)
                 Ok ~> SetCookies(Cookie("SESSION_ID", sessionId))
               }

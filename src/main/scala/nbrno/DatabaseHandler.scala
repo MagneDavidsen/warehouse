@@ -10,6 +10,7 @@ import scala.collection.mutable
 import javax.sql.DataSource
 import org.postgresql.ds.{PGPoolingDataSource, PGConnectionPoolDataSource, PGSimpleDataSource}
 import scala.util.Properties
+import java.sql.Timestamp
 
 
 // <p>If you're sure you want to use this, then you must set the properties
@@ -34,15 +35,19 @@ object DatabaseHandler {
     ds
   }
 
-  object Rappers extends Table[(Int, String)]("rappers") {
+  object Rappers extends Table[Rapper]("rappers") {
     def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     def name = column[String]("name")
-    def * = id ~ name
+    def createdAt = column[Timestamp]("created_at")
+    def * = id ~ name ~ createdAt <> ({t => Rapper(t._1, t._2, t._3)}, {(r:Rapper) => Some(r.id, r.name, r.createdAt)})
   }
 
   object UserObject {
-    def fromRow(id: Option[Int], username: String, email: String, passhash: Option[String]): User = User(id, username, email, passhash)
-    def toRow(u: User) = Some(u.id, u.username, u.email, u.passhash)
+    def fromRow(id: Option[Int], username: String, email: String, passhash: Option[String],
+                createdFromIp:Option[String],createdAt:Option[Timestamp]): User =
+                User(id, username, email, None, passhash, createdFromIp, createdAt)
+
+    def toRow(u: User) = Some(u.id, u.username, u.email, u.passhash, u.createdFromIp, u.createdAt)
   }
 
   object Users extends Table[User]("users"){
@@ -50,14 +55,19 @@ object DatabaseHandler {
     def username = column[String]("username")
     def email = column[String]("email")
     def passhash = columnToOptionColumn(column[String]("passhash"))
+    def createdFromIp = columnToOptionColumn(column[String]("created_from_ip"))
+    def createdAt = columnToOptionColumn(column[Timestamp]("created_at"))
 
-    def * = id ~ username ~ email ~ passhash <> (UserObject.fromRow _, UserObject.toRow _)
-    def forInsert = username ~ email ~ passhash <> ({ t => User(None, t._1, t._2, t._3)}, { (u: User) => Some((u.username, u.email, u.passhash))})
+
+    def * = id ~ username ~ email ~ passhash ~ createdFromIp ~ createdAt <> (UserObject.fromRow _, UserObject.toRow _)
+    def forInsert = username ~ email ~ passhash ~ createdFromIp <>
+      ({ t => User(None, t._1, t._2, None, t._3, t._4, None)}, { (u: User) => Some((u.username, u.email, u.passhash, u.createdFromIp))})
   }
 
   object RatingObject {
-    def fromRow(id : Int, user_id : Int, rapper_id : Int, rating : Int) : Rating = Rating(id, user_id, rapper_id, rating)
-    def toRow(r : Rating) = Some(r.id, r.userId, r.rapperId, r.rating)
+    def fromRow(id : Int, user_id : Int, rapper_id : Int, rating : Int, updatedAt:Timestamp) : Rating =
+      Rating(id, user_id, rapper_id, rating, updatedAt)
+    def toRow(r : Rating) = Some(r.id, r.userId, r.rapperId, r.rating, r.updatedAt)
   }
 
   object Ratings extends Table[Rating]("ratings"){
@@ -65,24 +75,26 @@ object DatabaseHandler {
     def user_id = column[Int]("user_id")
     def rapper_id = column[Int]("rapper_id")
     def rating = column[Int]("rating")
+    def updatedAt = column[Timestamp]("updated_at")
 
-    def * = id ~ user_id ~rapper_id ~ rating <> (RatingObject.fromRow _, RatingObject.toRow _)
+    def * = id ~ user_id ~rapper_id ~ rating ~ updatedAt <> (RatingObject.fromRow _, RatingObject.toRow _)
     def forInsert = user_id ~ rapper_id ~ rating
 
   }
 
   def getRappers: List[Rapper] = {
     Database.forDataSource(dataSource) withSession {
-      var rappers: mutable.MutableList[Rapper] = new mutable.MutableList[Rapper]
-      Query(Rappers) foreach {case (id, name) => rappers += new Rapper(Some(id), name)}
-      rappers.toList
+      Query(Rappers).list
   }}
 
-  def createUser(username: String, email: String, password: String): User = {
+  def createUser(user : User, ip : String): User = {
     Database.forDataSource(dataSource) withSession {
-      val passhash = SCryptUtil.scrypt(password, 512, 8 ,8)
-      val userId = Users.forInsert returning Users.id insert User(None, username, email, Some(passhash))
-      User(userId, username, email, None)
+      val passhash = SCryptUtil.scrypt(user.password.get, 512, 8 ,8)
+
+      val userId = Users.forInsert returning Users.id insert
+        User(None, user.username, user.email, None, Some(passhash), Some(ip), None)
+
+      User(userId, user.username, user.email, None, None,Some(ip), None)
     }
   }
 
