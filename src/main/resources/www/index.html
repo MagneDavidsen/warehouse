@@ -61,6 +61,8 @@
                 <label class="login-field-icon fui-lock" for="login-pass"></label>
             </div>
 
+            <span>{{error}}</span>
+
             <a class="btn btn-primary btn-large btn-block" href="" ng-click="login()">Logg inn</a>
             <a class="login-link" href="#">Glemt passord?</a>
             <span></span>
@@ -96,6 +98,7 @@
 <!-- Load JS here for greater good =============================-->
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular-resource.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular-cookies.js"></script>
 <script src="js/jquery-1.8.3.min.js"></script>
 <script src="js/jquery-ui-1.10.3.custom.min.js"></script>
 <script src="js/jquery.ui.touch-punch.min.js"></script>

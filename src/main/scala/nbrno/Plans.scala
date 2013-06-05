@@ -21,13 +21,16 @@ object RappersPlan extends Plan {
 
     case req@Path(Seg("api" ::"rappers" :: rapperId :: "vote" :: Nil)) =>
       val body : String = Body.string(req)
-      logger.info("RequestBody: " ++ body)
+
+      logger.info("RequestHeaders: " ++ body)
+
       req match {
       case POST(_) & Cookies(cookies) => req match {
         case RequestContentType("application/json;charset=UTF-8") => req match {
           case Accepts.Json(_) =>
             Ok ~> JsonContent ~> {
               val vote : Vote = read[Vote](body)
+              logger.info("SessionId: " ++ cookies("SESSION_ID").get.value)
               val user : Option[User] = NbrnoServer.getUserFromSessionStore(cookies("SESSION_ID").get.value)
               //TODO: Ensure rapperId is int
               if(user.isDefined){
@@ -63,7 +66,8 @@ object UserPlan extends Plan {
               if (DatabaseHandler.availableUsername(user.username)) {
                 val newUser : User = DatabaseHandler.createUser(user, req.remoteAddr)
                 val sessionId : String = NbrnoServer.addUserToSessionStore(newUser)
-                Ok ~> SetCookies(Cookie("SESSION_ID", sessionId))
+                //TODO Use cookie for this, when I get Angular.js to work with responsecookies
+                Ok ~> ResponseString("{\"SESSION_ID\":\"" ++sessionId++ "\" }")
               }
               else BadRequest ~> ResponseString("Username not available")
             }
@@ -86,7 +90,9 @@ object UserPlan extends Plan {
               val validatedUser = DatabaseHandler.validateUser(user.username, user.password.get)
               if (validatedUser.isDefined) {
                 val sessionId : String = NbrnoServer.addUserToSessionStore(validatedUser.get)
-                Ok ~> SetCookies(Cookie("SESSION_ID", sessionId))
+
+                //TODO Use cookie for this, when I get Angular.js to work with responsecookies
+                Ok ~> ResponseString("{\"SESSION_ID\":\"" ++sessionId++ "\" }")
               }
               else BadRequest ~> ResponseString("Wrong username or password")
             }
