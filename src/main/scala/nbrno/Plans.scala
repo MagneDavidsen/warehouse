@@ -4,9 +4,7 @@ import unfiltered.filter.Plan
 import unfiltered.request._
 import unfiltered.response._
 import nbrno.domain.{Vote, User}
-import org.json4s._
-import org.json4s.native.JsonMethods._
-import org.json4s.{JsonInput, DefaultFormats}
+import org.json4s.DefaultFormats
 import org.json4s.native.Serialization.{read, write}
 import unfiltered.response.ResponseString
 import org.slf4j.{LoggerFactory, Logger}
@@ -32,8 +30,11 @@ object RappersPlan extends Plan {
               val vote : Vote = read[Vote](body)
               val user : Option[User] = NbrnoServer.getUserFromSessionStore(cookies("SESSION_ID").get.value)
               //TODO: Ensure rapperId is int
-              if(user.isDefined) DatabaseHandler.vote(user.get.id.get, rapperId.toInt, vote.voteUp )
-              ResponseString("YO")
+              if(user.isDefined){
+                DatabaseHandler.vote(user.get.id.get, rapperId.toInt, vote.voteUp)
+                ResponseString("Vote registered")
+              }
+              else Unauthorized
             }
           case _ => NotAcceptable
         }
@@ -44,14 +45,13 @@ object RappersPlan extends Plan {
   }
 }
 
-
-object SignupPlan extends Plan {
+object UserPlan extends Plan {
   implicit val formats = DefaultFormats
-  val logger : Logger = LoggerFactory.getLogger("nbrno.SignupPlan")
+  val logger : Logger = LoggerFactory.getLogger("nbrno.UserPlan")
 
   def intent = {
 
-    case req@Path("/api/signup") =>
+    case req@Path("/api/user/signup") =>
       val body : String = Body.string(req)
       logger.info("RequestBody: " ++ body)
       req match {
@@ -74,7 +74,7 @@ object SignupPlan extends Plan {
       case _ => MethodNotAllowed
     }
 
-    case req@Path("/api/login") =>
+    case req@Path("/api/user/login") =>
       val body : String = Body.string(req)
       logger.info("RequestBody: " ++ body)
       req match {
@@ -97,13 +97,7 @@ object SignupPlan extends Plan {
       case _ => MethodNotAllowed
     }
 
-    case req@Path("/api/cookies") => req match {
-      case GET(_) & Cookies(cookies) => {
-        val s: String = cookies("SESSION_ID").get.value
-        ResponseString(s ++ ", ip: " ++ req.remoteAddr)
-      }
-      case _ => MethodNotAllowed
-    }
+
   }
 }
 

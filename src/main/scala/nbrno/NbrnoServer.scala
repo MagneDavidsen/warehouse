@@ -21,6 +21,6 @@ object NbrnoServer extends App {
   def getUserFromSessionStore (token : String) : Option[User] = sessionStore.get(token)
 
   Http(Properties.envOrElse("PORT", "8081").toInt).resources(new URL(getClass().getResource("/www/"), "."))
-    .filter(RappersPlan).filter(SignupPlan).run()
+    .filter(RappersPlan).filter(UserPlan).run()
 
 }
