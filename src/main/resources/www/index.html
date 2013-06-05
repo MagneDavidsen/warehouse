@@ -29,10 +29,10 @@
     </div>
     <!-- /demo-headline -->
 
-    <div class="rapperList"  ng-controller="RapperListCtrl">
-        <div class="row demo-row" ng-repeat="rapper in rappers">
+    <div class="rapperList"  ng-controller="RapperListCtrl"> 
+        <div class="row demo-row" ng-repeat="rapper in rappers | orderBy:predicate:true">
             <div class="span1">
-                <a href="#fakelink" class="btn btn-block btn-large">#{{rapper.id}}</a>
+                <a href="#fakelink" class="btn btn-block btn-large">#{{$index + 1}}</a>
             </div>
 
             <div class="span9">

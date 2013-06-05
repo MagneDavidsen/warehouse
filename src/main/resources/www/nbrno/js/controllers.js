@@ -4,6 +4,7 @@
 
 function RapperListCtrl($scope, Rapper, Vote) {
     $scope.rappers = Rapper.query();
+    $scope.predicate = "score";
 
     $scope.vote = function (rapperId, voteUp) {
         Vote.save({

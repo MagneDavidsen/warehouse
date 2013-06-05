@@ -31,7 +31,7 @@ object DatabaseHandler {
     def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     def name = column[String]("name")
     def createdAt = column[Timestamp]("created_at")
-    def * = id ~ name ~ createdAt <> ({t => Rapper(t._1, t._2, t._3)}, {(r:Rapper) => Some(r.id, r.name, r.createdAt)})
+    def * = id ~ name ~ createdAt <> ({t => Rapper(t._1, t._2, None, t._3)}, {(r:Rapper) => Some(r.id, r.name, r.createdAt)})
   }
 
   object UserObject {
@@ -74,10 +74,20 @@ object DatabaseHandler {
       ({t => Rating(None, t._1, t._2, t._3, t._4)}, {(r : Rating) => Some((r.userId, r.rapperId, r.rating, r.updatedAt))})
   }
 
+  //TODO: Refactor when I understand Slick
   def getRappers: List[Rapper] = {
     Database.forDataSource(dataSource) withSession {
-      Query(Rappers).list
-  }}
+      val rappersRatings = (for {
+        rappers <- Rappers
+        ratings <- Ratings if rappers.id === ratings.rapper_id
+      } yield (rappers, ratings))
+
+      val grouped = rappersRatings.list.groupBy{case (rapper, rating) => rapper.id}
+
+      grouped.map{case (rapperId, rr) =>
+        (Rapper(rapperId, rr.head._1.name, Some(rr.map{
+          case (rapper, rating) => rating.rating}.sum), rr.head._1.createdAt))}.toList
+     }}
 
   def createUser(user : User, ip : String): User = {
     Database.forDataSource(dataSource) withSession {
