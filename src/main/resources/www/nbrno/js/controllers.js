@@ -2,24 +2,37 @@
 
 /* Controllers */
 
-function RapperListCtrl($scope, Rapper, Vote) {
-    $scope.rappers = Rapper.query();
-    $scope.predicate = "score";
+function RapperListCtrl($scope, sharedService, $http ) {
+    $scope.rappers;
+    $scope.predicate = ["score", "-name"];
 
-    var vote = function (rapperId, voteUp) {
-        Vote.save({
-            rapperId: rapperId, voteUp: voteUp});
+    $http.get('/api/rappers').
+        success(function(data){$scope.rappers=data})
+
+    function voted(data){
+        console.log("voted")
+    }
+
+    function novote(data){
+        showLogin()
+        console.log("not voted")
     }
 
     $scope.vote = function (rapperId, voteUp) {
-        var result = vote(rapperId, voteUp)
-        console.log(result)
+        $http.post('/api/rappers/'+rapperId+'/vote', {voteUp: voteUp}).
+            success(voted).error(showLogin);
     }
+
+    function showLogin() {
+        sharedService.prepForBroadcast("showLogin");
+    };
 
 
 }
 
-function LoginCtrl($scope, $http, $cookies, Signup) {
+function LoginCtrl($scope, sharedService, $http, $cookies) {
+
+    $scope.showLogin = false;
 
     $scope.loginUser = ""
     $scope.loginPassword = ""
@@ -30,12 +43,27 @@ function LoginCtrl($scope, $http, $cookies, Signup) {
 
     $scope.error = ""
 
+    $scope.$on('handleBroadcast', function() {
+        switch(sharedService.message)
+        {
+            case "showLogin":
+                $scope.showLogin = true
+                break;
+        }
+    });
+
+
     function loggedIn(data, status, header){
-        $cookies.SESSION_ID = data.SESSION_ID
+        console.log("logged in")
+        $scope.showLogin = false
 
     }
 
     function notLoggedIn(data, status, header){
+        $scope.error = "Feil brukernavn eller passord"
+    }
+
+    function notSignedup(data, status, header){
         $scope.error = "Feil brukernavn eller passord"
     }
 
@@ -45,9 +73,10 @@ function LoginCtrl($scope, $http, $cookies, Signup) {
     }
 
     $scope.signup = function () {
-        Signup.save({
-            username: $scope.signupUser, email: $scope.signupEmail, password: $scope.signupPassword});
+
+        $http.post('/api/user/signup', {username: $scope.signupUser, email: $scope.signupEmail, password: $scope.signupPassword}).
+            success(loggedIn).error(notSignedup);
     }
 
-
 }
+

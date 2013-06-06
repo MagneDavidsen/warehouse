@@ -6,6 +6,8 @@
   font-weight: normal;
   font-style: normal;
 }
+
+
 /* Use the following CSS code if you want to use data attributes for inserting your icons */
 [data-icon]:before {
   font-family: 'Flat-UI-Icons';
@@ -22,6 +24,19 @@ Instead of a list of all class selectors,
 you can use the generic selector below, but it's slower:
 [class*="fui-"] {
 */
+.fui-arrow-up,
+.fui-arrow-down{
+    display: inline-block;
+    font-family: 'Flat-UI-Icons';
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    -webkit-font-smoothing: antialiased;
+    -webkit-transform: rotate(90deg);
+}
+
 .fui-arrow-right,
 .fui-arrow-left,
 .fui-cmd,
@@ -60,9 +75,17 @@ you can use the generic selector below, but it's slower:
   font-variant: normal;
   text-transform: none;
   -webkit-font-smoothing: antialiased;
+
 }
 .fui-arrow-right:before {
   content: "\e02c";
+}
+.fui-arrow-up:before {
+    content: "\e02d";
+}
+
+.fui-arrow-down:before {
+    content: "\e02c";
 }
 .fui-arrow-left:before {
   content: "\e02d";
@@ -181,7 +204,7 @@ you can use the generic selector below, but it's slower:
   border-top-color: #34495e !important;
 }
 .demo-headline {
-  padding: 73px 0 110px;
+  padding: 20px 0 40px;
   text-align: center;
 }
 .demo-logo {
@@ -3477,11 +3500,13 @@ body.vjs-full-window {
 }
 .login-form {
   background-color: #edeff1;
-  padding: 24px 23px 20px;
+  padding: 20px 38px 20px;
   position: relative;
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
   border-radius: 6px;
+
+
 }
 
 

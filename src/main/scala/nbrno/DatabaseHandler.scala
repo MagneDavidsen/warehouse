@@ -75,18 +75,20 @@ object DatabaseHandler {
   }
 
   //TODO: Refactor when I understand Slick
-  def getRappers: List[Rapper] = {
+  def getRappersWithScore: List[Rapper] = {
     Database.forDataSource(dataSource) withSession {
-      val rappersRatings = (for {
-        rappers <- Rappers
-        ratings <- Ratings if rappers.id === ratings.rapper_id
-      } yield (rappers, ratings))
+
+      val rappersRatings = for {
+        (rappers, ratings) <- Rappers leftJoin Ratings on (_.id === _.rapper_id)
+      } yield (rappers, ratings.rating.?)
 
       val grouped = rappersRatings.list.groupBy{case (rapper, rating) => rapper.id}
 
+      val liste = grouped
+
       grouped.map{case (rapperId, rr) =>
         (Rapper(rapperId, rr.head._1.name, Some(rr.map{
-          case (rapper, rating) => rating.rating}.sum), rr.head._1.createdAt))}.toList
+          case (rapper, rating) => if(rating.isDefined) rating.get else 0 }.sum), rr.head._1.createdAt))}.toList
      }}
 
   def createUser(user : User, ip : String): User = {

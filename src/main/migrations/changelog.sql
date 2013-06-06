@@ -27,3 +27,9 @@ CREATE TABLE ratings (
 );
 
 CREATE UNIQUE INDEX ratingindex ON ratings (user_id, rapper_id);
+
+--changeset magne:2
+INSERT INTO rappers (name) VALUES
+('RSP'), ('Klish'), ('Mats Dawg'), ('Chirag'), ('Magdi'), ('Oter'), ('Vinni'), ('Kaveh'), ('Pumba'), ('Lars Rubix'),
+('LidoLido'), ('Lars Vaular'),('Jonas V'), ('Flex'), ('Vågard'), ('Store P'),('Girson'), ('Joddski'), ('OnklP'),
+('Jaa9'),('Tshawe'), ('Yosef'), ('Fela'),('Verk'), ('Don Martin');

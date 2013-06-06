@@ -16,7 +16,7 @@ object RappersPlan extends Plan {
 
   def intent = {
     case GET(_) & Path("/api/rappers")  => {
-      ResponseString(write(DatabaseHandler.getRappers))
+      ResponseString(write(DatabaseHandler.getRappersWithScore))
     }
 
     case req@Path(Seg("api" ::"rappers" :: rapperId :: "vote" :: Nil)) =>
@@ -59,11 +59,11 @@ object UserPlan extends Plan {
         case RequestContentType("application/json;charset=UTF-8") => req match {
           case Accepts.Json(_) =>
             Ok ~> JsonContent ~> {
-              val user: User = read[User](Body.string(req))
+              val user: User = read[User](body)
               if (DatabaseHandler.availableUsername(user.username)) {
                 val newUser : User = DatabaseHandler.createUser(user, req.remoteAddr)
                 val sessionId : String = NbrnoServer.addUserToSessionStore(newUser)
-                Ok ~> SetCookies(Cookie("SESSION_ID", sessionId))
+                Ok ~> SetCookies(Cookie("SESSION_ID", sessionId, None, Some("/")))
               }
               else BadRequest ~> ResponseString("Username not available")
             }
@@ -86,7 +86,7 @@ object UserPlan extends Plan {
               val validatedUser = DatabaseHandler.validateUser(user.username, user.password.get)
               if (validatedUser.isDefined) {
                 val sessionId : String = NbrnoServer.addUserToSessionStore(validatedUser.get)
-                Ok ~> SetCookies(Cookie("SESSION_ID", sessionId))
+                Ok ~> SetCookies(Cookie("SESSION_ID", sessionId, None, Some("/")))
               }
               else BadRequest ~> ResponseString("Wrong username or password")
             }
@@ -96,8 +96,6 @@ object UserPlan extends Plan {
       }
       case _ => MethodNotAllowed
     }
-
-
   }
 }
 
