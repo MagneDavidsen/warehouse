@@ -43,3 +43,7 @@ libraryDependencies += "org.json4s" %% "json4s-native" % "3.2.4"
 libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.5"
 
 libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.13"
+
+libraryDependencies += "org.scalatest" %% "scalatest" % "1.9.1" % "test"
+
+libraryDependencies += "junit" % "junit" % "4.10" % "test"

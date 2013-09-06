@@ -28,7 +28,7 @@ object RappersPlan extends Plan {
           case Accepts.Json(_) =>
             Ok ~> JsonContent ~> {
               val vote : Vote = read[Vote](body)
-              val user : Option[User] = NbrnoServer.getUserFromSessionStore(cookies("SESSION_ID").get.value)
+              val user : Option[User] = NbrnoServer.sessionStore.getUser(cookies("SESSION_ID").get.value)
               //TODO: Ensure rapperId is int
               if(user.isDefined){
                 DatabaseHandler.vote(user.get.id.get, rapperId.toInt, vote.voteUp)
@@ -62,7 +62,7 @@ object UserPlan extends Plan {
               val user: User = read[User](body)
               if (DatabaseHandler.availableUsername(user.username)) {
                 val newUser : User = DatabaseHandler.createUser(user, req.remoteAddr)
-                val sessionId : String = NbrnoServer.addUserToSessionStore(newUser)
+                val sessionId : String = NbrnoServer.sessionStore.addUser(newUser)
                 Ok ~> SetCookies(Cookie("SESSION_ID", sessionId, None, Some("/")))
               }
               else BadRequest ~> ResponseString("Username not available")
@@ -85,7 +85,7 @@ object UserPlan extends Plan {
               val user: User = read[User](body)
               val validatedUser = DatabaseHandler.validateUser(user.username, user.password.get)
               if (validatedUser.isDefined) {
-                val sessionId : String = NbrnoServer.addUserToSessionStore(validatedUser.get)
+                val sessionId : String = NbrnoServer.sessionStore.addUser(validatedUser.get)
                 Ok ~> SetCookies(Cookie("SESSION_ID", sessionId, None, Some("/")))
               }
               else BadRequest ~> ResponseString("Wrong username or password")
@@ -96,7 +96,6 @@ object UserPlan extends Plan {
       }
       case _ => MethodNotAllowed
     }
-  }
 }
 
 
