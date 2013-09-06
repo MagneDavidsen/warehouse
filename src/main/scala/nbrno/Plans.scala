@@ -96,6 +96,7 @@ object UserPlan extends Plan {
       }
       case _ => MethodNotAllowed
     }
+  }
 }
 
 
