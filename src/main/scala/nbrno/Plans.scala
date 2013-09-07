@@ -96,6 +96,25 @@ object UserPlan extends Plan {
       }
       case _ => MethodNotAllowed
     }
+
+    case req@Path("/api/user/logout") =>
+      val body : String = Body.string(req)
+      logger.info("RequestBody: " ++ body)
+      req match {
+        case POST(_) & Cookies(cookies) => req match {
+          case RequestContentType("application/json;charset=UTF-8") => req match {
+            case Accepts.Json(_) =>
+              Ok ~> JsonContent ~> {
+
+                NbrnoServer.sessionStore.removeUser(cookies("SESSION_ID").get.value)
+                Ok ~> SetCookies(Cookie("SESSION_ID", "", None, Some("/")))
+              }
+            case _ => NotAcceptable
+          }
+          case _ => UnsupportedMediaType
+        }
+        case _ => MethodNotAllowed
+      }
   }
 }
 

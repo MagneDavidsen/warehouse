@@ -63,6 +63,14 @@ function LoginCtrl($scope, sharedService, $http, $cookies) {
         $scope.error = "Feil brukernavn eller passord"
     }
 
+    function loggedOut(data, status, header){
+        console.log("logged out")
+    }
+
+    function notLoggedOut(data, status, header){
+        console.log("could not log out")
+    }
+
     function notSignedup(data, status, header){
         $scope.error = "Feil brukernavn eller passord"
     }
@@ -70,6 +78,11 @@ function LoginCtrl($scope, sharedService, $http, $cookies) {
     $scope.login = function () {
         $http.post('/api/user/login', {username: $scope.loginUser, password: $scope.loginPassword}).
             success(loggedIn).error(notLoggedIn);
+    }
+
+    $scope.logout = function () {
+        $http.post('/api/user/logout', {username: $scope.loginUser}  ).
+            success(loggedOut).error(notLoggedOut);
     }
 
     $scope.signup = function () {
