@@ -12,20 +12,9 @@ import scala.util.Properties
 import java.sql.Timestamp
 import java.util.Date
 
-object DatabaseHandler {
+class DatabaseHandler(dataSource : DataSource) {
 
   def now : Timestamp = new Timestamp(new Date().getTime)
-
-  val dataSource: DataSource = {
-    val ds = new PGPoolingDataSource
-    ds.setDataSourceName("nbrno")
-    ds.setDatabaseName("nbrno")
-    ds.setUser(Properties.envOrElse("DB_USER", "clocking"))
-    ds.setPassword(Properties.envOrElse("DB_PASSWORD", "clocking"))
-    ds.setServerName("localhost")
-    ds.setPortNumber(5432)
-    ds
-  }
 
   object Rappers extends Table[Rapper]("rappers") {
     def id = column[Int]("id", O.PrimaryKey, O.AutoInc)

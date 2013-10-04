@@ -13,10 +13,11 @@ import unfiltered.Cookie
 object RappersPlan extends Plan {
   implicit val formats = DefaultFormats
   val logger : Logger = LoggerFactory.getLogger("nbrno.RappersPlan")
+  val dbHandler : DatabaseHandler = NbrnoServer.dbHandler
 
   def intent = {
     case GET(_) & Path("/api/rappers")  => {
-      ResponseString(write(DatabaseHandler.getRappersWithScore))
+      ResponseString(write(dbHandler.getRappersWithScore))
     }
 
     case req@Path(Seg("api" ::"rappers" :: rapperId :: "vote" :: Nil)) =>
@@ -31,7 +32,7 @@ object RappersPlan extends Plan {
               val user : Option[User] = NbrnoServer.sessionStore.getUser(cookies("SESSION_ID").get.value)
               //TODO: Ensure rapperId is int
               if(user.isDefined){
-                DatabaseHandler.vote(user.get.id.get, rapperId.toInt, vote.voteUp)
+                dbHandler.vote(user.get.id.get, rapperId.toInt, vote.voteUp)
                 ResponseString("Vote registered")
               }
               else Unauthorized
@@ -48,6 +49,7 @@ object RappersPlan extends Plan {
 object UserPlan extends Plan {
   implicit val formats = DefaultFormats
   val logger : Logger = LoggerFactory.getLogger("nbrno.UserPlan")
+  val dbHandler : DatabaseHandler = NbrnoServer.dbHandler
 
   def intent = {
 
@@ -60,8 +62,8 @@ object UserPlan extends Plan {
           case Accepts.Json(_) =>
             Ok ~> JsonContent ~> {
               val user: User = read[User](body)
-              if (DatabaseHandler.availableUsername(user.username)) {
-                val newUser : User = DatabaseHandler.createUser(user, req.remoteAddr)
+              if (dbHandler.availableUsername(user.username)) {
+                val newUser : User = dbHandler.createUser(user, req.remoteAddr)
                 val sessionId : String = NbrnoServer.sessionStore.addUser(newUser)
                 Ok ~> SetCookies(Cookie("SESSION_ID", sessionId, None, Some("/")))
               }
@@ -83,7 +85,7 @@ object UserPlan extends Plan {
           case Accepts.Json(_) =>
             Ok ~> JsonContent ~> {
               val user: User = read[User](body)
-              val validatedUser = DatabaseHandler.validateUser(user.username, user.password.get)
+              val validatedUser = dbHandler.validateUser(user.username, user.password.get)
               if (validatedUser.isDefined) {
                 val sessionId : String = NbrnoServer.sessionStore.addUser(validatedUser.get)
                 Ok ~> SetCookies(Cookie("SESSION_ID", sessionId, None, Some("/")))
