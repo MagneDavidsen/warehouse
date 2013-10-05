@@ -3,12 +3,9 @@ package nbrno
 import scala.slick.driver.PostgresDriver.simple._
 import scala.slick.session.Database
 import Database.threadLocalSession
-import scala.slick.lifted.Query
 import nbrno.domain.{Rating, Rapper, User}
 import com.lambdaworks.crypto.SCryptUtil
 import javax.sql.DataSource
-import org.postgresql.ds.PGPoolingDataSource
-import scala.util.Properties
 import java.sql.Timestamp
 import java.util.Date
 
@@ -63,8 +60,9 @@ class DatabaseHandler(dataSource : DataSource) {
       ({t => Rating(None, t._1, t._2, t._3, t._4)}, {(r : Rating) => Some((r.userId, r.rapperId, r.rating, r.updatedAt))})
   }
 
+
   //TODO: Refactor when I understand Slick
-  def getRappersWithScore: List[Rapper] = {
+  def getRappersWithTotalScore : List[Rapper] = {
     Database.forDataSource(dataSource) withSession {
 
       val rappersRatings = for {
@@ -72,8 +70,6 @@ class DatabaseHandler(dataSource : DataSource) {
       } yield (rappers, ratings.rating.?)
 
       val grouped = rappersRatings.list.groupBy{case (rapper, rating) => rapper.id}
-
-      val liste = grouped
 
       grouped.map{case (rapperId, rr) =>
         (Rapper(rapperId, rr.head._1.name, Some(rr.map{

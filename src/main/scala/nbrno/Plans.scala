@@ -17,7 +17,7 @@ object RappersPlan extends Plan {
 
   def intent = {
     case GET(_) & Path("/api/rappers")  => {
-      ResponseString(write(dbHandler.getRappersWithScore))
+      ResponseString(write(dbHandler.getRappersWithTotalScore))
     }
 
     case req@Path(Seg("api" ::"rappers" :: rapperId :: "vote" :: Nil)) =>
