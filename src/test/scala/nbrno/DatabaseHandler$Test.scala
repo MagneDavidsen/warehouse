@@ -10,6 +10,15 @@ import nbrno.domain.{User, Rapper}
 
 class DatabaseHandler$Test extends FunSuite with BeforeAndAfter with BeforeAndAfterAll{
 
+  val user1 = new User(Some(1), "user-1", Some("email-1"), Some("password-1"), Some("hash-1"), Some("ip-1"),
+    Some(Timestamp.valueOf("2013-06-20 13:37:00")))
+  val user2 = new User(Some(2), "user-2", Some("email-2"), Some("password-2"), Some("hash-2"), Some("ip-2"),
+    Some(Timestamp.valueOf("2013-06-20 13:37:00")))
+
+  val rapper1 = new Rapper(1, "rapper-1", Some(0), Timestamp.valueOf("2013-06-20 13:37:00"))
+  val rapper2 = new Rapper(1, "rapper-2", Some(0), Timestamp.valueOf("2013-06-20 13:37:00"))
+  val rapper3 = new Rapper(1, "rapper-3", Some(0), Timestamp.valueOf("2013-06-20 13:37:00"))
+
   val dataSource: DataSource = {
     val ds = new JdbcDataSource
     ds.setURL("jdbc:h2:mem:test1")
@@ -20,18 +29,12 @@ class DatabaseHandler$Test extends FunSuite with BeforeAndAfter with BeforeAndAf
   implicit val session = Database.forDataSource(dataSource).createSession()
 
   override def beforeAll {
+    //create all tables
     (dbHandler.Rappers.ddl ++ dbHandler.Ratings.ddl ++ dbHandler.Users.ddl).create
 
-    dbHandler.Rappers.insertAll(
-      new Rapper(1, "RSP", Some(1), Timestamp.valueOf("2013-06-20 13:37:00")),
-      new Rapper(2, "Klish", Some(1), Timestamp.valueOf("2013-06-20 13:37:00")),
-      new Rapper(3, "Mats Dawg", Some(1), Timestamp.valueOf("2013-06-20 13:37:00")))
-
-    dbHandler.Users.insertAll(
-      new User(Some(1), "magnekd", Some("magne.davidsen@gmail.com"), Some("pass"), Some("hash"), Some("ip"),
-        Some(Timestamp.valueOf("2013-06-20 13:37:00"))),
-      new User(Some(2), "rolf", Some("rolf@gmail.com"), Some("pass"), Some("hash"), Some("ip"),
-        Some(Timestamp.valueOf("2013-06-20 13:37:00"))))
+    //populate rappers and users
+    dbHandler.Rappers.insertAll(rapper1, rapper2, rapper3)
+    dbHandler.Users.insertAll(user1, user2)
   }
 
   after{
@@ -45,37 +48,45 @@ class DatabaseHandler$Test extends FunSuite with BeforeAndAfter with BeforeAndAf
   }
 
   test("vote get counted"){
-    //magnekd votes up for RSP
-    dbHandler.vote(1,1, true)
+    dbHandler.vote(user1.id.get, rapper1.id, true)
 
-    //RSP has total score of 1
     assert(dbHandler.getRappersWithTotalScore.find(_.id == 1).get.score.get == 1)
   }
 
   test("only one vote per user get counted"){
-    //magnekd votes up for RSP
-    dbHandler.vote(1,1, true)
-    dbHandler.vote(1,1, true)
+    dbHandler.vote(user1.id.get,rapper1.id, true)
+    dbHandler.vote(user1.id.get,rapper1.id, true)
 
-    //RSP has total score of 1
     assert(dbHandler.getRappersWithTotalScore.find(_.id == 1).get.score.get == 1)
   }
 
   test("votes from two users get counted"){
-    //magnekd and rolf votes up for RSP
-    dbHandler.vote(1,1, true)
-    dbHandler.vote(2,1, true)
+    dbHandler.vote(user1.id.get,rapper1.id, true)
+    dbHandler.vote(user2.id.get,rapper1.id, true)
 
-    //RSP has total score of 2
-    assert(dbHandler.getRappersWithTotalScore.find(_.id == 1).get.score.get == 2)
+    assert(dbHandler.getRappersWithTotalScore.find(_.id == rapper1.id).get.score.get == 2)
   }
 
   test("vote first up then down gives right score"){
-    //magnekd and rolf votes up for RSP
-    dbHandler.vote(1,1, true)
-    dbHandler.vote(1,1, false)
+    dbHandler.vote(user1.id.get,rapper1.id, true)
+    dbHandler.vote(user1.id.get,rapper1.id, false)
 
-    //RSP has total score of -1
-    assert(dbHandler.getRappersWithTotalScore.find(_.id == 1).get.score.get == -1)
+    assert(dbHandler.getRappersWithTotalScore.find(_.id == rapper1.id).get.score.get == -1)
+  }
+
+  test("getVotes returns all users votes"){
+    dbHandler.vote(user1.id.get,rapper1.id,true)
+    dbHandler.vote(user1.id.get,rapper2.id,true)
+    dbHandler.vote(user1.id.get,rapper3.id,true)
+
+    assert(dbHandler.getVotes(user1.username).length == 3)
+  }
+
+  test("getVotes returns one vote per rapper"){
+    dbHandler.vote(user1.id.get,rapper1.id,true)
+    dbHandler.vote(user1.id.get,rapper1.id,false)
+    dbHandler.vote(user1.id.get,rapper1.id,true)
+
+    assert(dbHandler.getVotes(user1.username).length == 1)
   }
 }

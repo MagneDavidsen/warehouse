@@ -60,11 +60,16 @@ class DatabaseHandler(dataSource : DataSource) {
       ({t => Rating(None, t._1, t._2, t._3, t._4)}, {(r : Rating) => Some((r.userId, r.rapperId, r.rating, r.updatedAt))})
   }
 
+  def getVotes(username : String) : List[Rating] = {
+    Database.forDataSource(dataSource) withSession {
+      val userId : Option[Int] = Query(Users).filter(_.username === username).first.id
+      Query(Ratings).filter(_.user_id === userId).list
+    }
+  }
 
   //TODO: Refactor when I understand Slick
   def getRappersWithTotalScore : List[Rapper] = {
     Database.forDataSource(dataSource) withSession {
-
       val rappersRatings = for {
         (rappers, ratings) <- Rappers leftJoin Ratings on (_.id === _.rapper_id)
       } yield (rappers, ratings.rating.?)
