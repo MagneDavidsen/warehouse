@@ -16,8 +16,16 @@ object RappersPlan extends Plan {
   val dbHandler : DatabaseHandler = NbrnoServer.dbHandler
 
   def intent = {
-    case GET(_) & Path("/api/rappers")  => {
-      ResponseString(write(dbHandler.getRappersWithTotalScore))
+    case GET(_) & Cookies(cookies) & Path("/api/rappers")  => {
+      val user : Option[User] = NbrnoServer.sessionStore.getUser(cookies("SESSION_ID").get.value)
+      val rappersString = write(dbHandler.getRappersWithTotalScore)
+      var votesString = ""
+      user match {
+        case Some(value) => votesString = write(dbHandler.getVotes(user.get.username))
+        case None => votesString = "[]"
+      }
+
+      ResponseString("{\"rappers\": " ++ rappersString ++ ", \"votes\": " ++ votesString ++ "}")
     }
 
     case req@Path(Seg("api" ::"rappers" :: rapperId :: "vote" :: Nil)) =>

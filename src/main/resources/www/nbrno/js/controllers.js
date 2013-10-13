@@ -5,11 +5,16 @@
 function RapperListCtrl($scope, sharedService, $http ) {
     $scope.rappers;
     $scope.predicate = ["score", "-name"];
+    $scope.unauthorizedVote;
 
     $http.get('/api/rappers').
-        success(function(data){$scope.rappers=data})
+        success(function(data){
+            $scope.rappers=data.rappers;
+            if(data.votes.length > 0) updateRappersWithVotes($scope.rappers, data.votes);
+        })
 
     function voted(data){
+
         console.log("voted")
     }
 
@@ -21,11 +26,7 @@ function RapperListCtrl($scope, sharedService, $http ) {
     function updateRappersWithVotes(rappers, votes){
         for(var i = 0; i<rappers.length;i++){
             for(var o = 0; o<votes.length;o++){
-                if(rappers[i].id === votes[o].rapperId){
-                    console.log("rapper.id: " + rappers[i].id)
-                    console.log("vote.rapperId: " + votes[o].rapperId)
-                    rappers[i].rating = votes[o].rating;
-                }
+                if(rappers[i].id === votes[o].rapperId) rappers[i].rating = votes[o].rating;
             }
         }
         return rappers;
@@ -33,7 +34,15 @@ function RapperListCtrl($scope, sharedService, $http ) {
 
     $scope.vote = function (rapperId, voteUp) {
         $http.post('/api/rappers/'+rapperId+'/vote', {voteUp: voteUp}).
-            success(voted).error(showLogin);
+            success(function(){
+                for(var i = 0; i < $scope.rappers.length; i++){
+                    if($scope.rappers[i].id == rapperId) $scope.rappers[i].rating = voteUp ? 1 : -1;
+                }
+                voted();
+            }).error(function(){
+                $scope.unauthorizedVote = {rapperId: rapperId, voteUp:voteUp}
+                showLogin();
+            });
     }
 
     function showLogin() {
@@ -43,7 +52,12 @@ function RapperListCtrl($scope, sharedService, $http ) {
     $scope.$on('handleBroadcast', function() {
         switch(sharedService.message)
         {
-            case "updateRappers":
+            case "loggedIn":
+                if($scope.unauthorizedVote != null){
+                    console.log("unauthorizedVote getting sent");
+                    $scope.vote($scope.unauthorizedVote.rapperId, $scope.unauthorizedVote.voteUp)
+                    $scope.unauthorizedVote = undefined;
+                }
                 $scope.rappers = updateRappersWithVotes($scope.rappers, sharedService.votes);
                 break;
         }
@@ -74,10 +88,11 @@ function LoginCtrl($scope, sharedService, $http, $cookies) {
 
     function loggedIn(data, status, header){
         console.log("logged in")
+
         $scope.showLogin = false
 
         sharedService.votes = data;
-        sharedService.prepForBroadcast("updateRappers")
+        sharedService.prepForBroadcast("loggedIn")
     }
 
     function notLoggedIn(data, status, header){

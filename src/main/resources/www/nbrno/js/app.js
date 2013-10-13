@@ -12,6 +12,7 @@ theapp.factory('sharedService', function($rootScope) {
 
     sharedService.message = '';
     sharedService.votes= '';
+    sharedService.unauthorizedVote;
 
     sharedService.updateRappers = function(votes){
         sharedService.votes = votes;
