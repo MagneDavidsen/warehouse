@@ -88,7 +88,8 @@ object UserPlan extends Plan {
               val validatedUser = dbHandler.validateUser(user.username, user.password.get)
               if (validatedUser.isDefined) {
                 val sessionId : String = NbrnoServer.sessionStore.addUser(validatedUser.get)
-                Ok ~> SetCookies(Cookie("SESSION_ID", sessionId, None, Some("/")))
+                Ok ~> JsonContent ~> SetCookies(Cookie("SESSION_ID", sessionId, None, Some("/"))) ~>
+                  ResponseString(write(dbHandler.getVotes(validatedUser.get.username)))
               }
               else BadRequest ~> ResponseString("Wrong username or password")
             }
@@ -107,8 +108,8 @@ object UserPlan extends Plan {
           case RequestContentType("application/json;charset=UTF-8") => req match {
             case Accepts.Json(_) =>
               Ok ~> JsonContent ~> {
-
-                NbrnoServer.sessionStore.removeUser(cookies("SESSION_ID").get.value)
+                val sessionId = cookies("SESSION_ID")
+                if(sessionId.isDefined) NbrnoServer.sessionStore.removeUser(sessionId.get.value)
                 Ok ~> SetCookies(Cookie("SESSION_ID", "", None, Some("/")))
               }
             case _ => NotAcceptable
