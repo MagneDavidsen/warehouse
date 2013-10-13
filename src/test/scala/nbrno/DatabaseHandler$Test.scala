@@ -16,8 +16,8 @@ class DatabaseHandler$Test extends FunSuite with BeforeAndAfter with BeforeAndAf
     Some(Timestamp.valueOf("2013-06-20 13:37:00")))
 
   val rapper1 = new Rapper(1, "rapper-1", Some(0), Timestamp.valueOf("2013-06-20 13:37:00"))
-  val rapper2 = new Rapper(1, "rapper-2", Some(0), Timestamp.valueOf("2013-06-20 13:37:00"))
-  val rapper3 = new Rapper(1, "rapper-3", Some(0), Timestamp.valueOf("2013-06-20 13:37:00"))
+  val rapper2 = new Rapper(2, "rapper-2", Some(0), Timestamp.valueOf("2013-06-20 13:37:00"))
+  val rapper3 = new Rapper(3, "rapper-3", Some(0), Timestamp.valueOf("2013-06-20 13:37:00"))
 
   val dataSource: DataSource = {
     val ds = new JdbcDataSource
@@ -88,5 +88,15 @@ class DatabaseHandler$Test extends FunSuite with BeforeAndAfter with BeforeAndAf
     dbHandler.vote(user1.id.get,rapper1.id,true)
 
     assert(dbHandler.getVotes(user1.username).length == 1)
+  }
+
+  test("getVotes only returns this users vote"){
+    dbHandler.vote(user1.id.get,rapper1.id,true)
+    dbHandler.vote(user1.id.get,rapper2.id,false)
+    dbHandler.vote(user1.id.get,rapper3.id,true)
+
+    dbHandler.vote(user2.id.get,rapper3.id,true)
+
+    assert(dbHandler.getVotes(user1.username).length == 3)
   }
 }
