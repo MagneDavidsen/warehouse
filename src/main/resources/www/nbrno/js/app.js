@@ -11,6 +11,12 @@ theapp.factory('sharedService', function($rootScope) {
     var sharedService = {};
 
     sharedService.message = '';
+    sharedService.votes= '';
+
+    sharedService.updateRappers = function(votes){
+        sharedService.votes = votes;
+        this.broadcastItem();
+    }
 
     sharedService.prepForBroadcast = function(msg) {
         this.message = msg;

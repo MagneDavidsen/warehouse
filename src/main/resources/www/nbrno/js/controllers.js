@@ -18,6 +18,19 @@ function RapperListCtrl($scope, sharedService, $http ) {
         console.log("not voted")
     }
 
+    function updateRappersWithVotes(rappers, votes){
+        for(var i = 0; i<rappers.length;i++){
+            for(var o = 0; o<votes.length;o++){
+                if(rappers[i].id === votes[o].rapperId){
+                    console.log("rapper.id: " + rappers[i].id)
+                    console.log("vote.rapperId: " + votes[o].rapperId)
+                    rappers[i].rating = votes[o].rating;
+                }
+            }
+        }
+        return rappers;
+    }
+
     $scope.vote = function (rapperId, voteUp) {
         $http.post('/api/rappers/'+rapperId+'/vote', {voteUp: voteUp}).
             success(voted).error(showLogin);
@@ -27,7 +40,14 @@ function RapperListCtrl($scope, sharedService, $http ) {
         sharedService.prepForBroadcast("showLogin");
     };
 
-
+    $scope.$on('handleBroadcast', function() {
+        switch(sharedService.message)
+        {
+            case "updateRappers":
+                $scope.rappers = updateRappersWithVotes($scope.rappers, sharedService.votes);
+                break;
+        }
+    });
 }
 
 function LoginCtrl($scope, sharedService, $http, $cookies) {
@@ -52,11 +72,12 @@ function LoginCtrl($scope, sharedService, $http, $cookies) {
         }
     });
 
-
     function loggedIn(data, status, header){
         console.log("logged in")
         $scope.showLogin = false
 
+        sharedService.votes = data;
+        sharedService.prepForBroadcast("updateRappers")
     }
 
     function notLoggedIn(data, status, header){
@@ -86,10 +107,8 @@ function LoginCtrl($scope, sharedService, $http, $cookies) {
     }
 
     $scope.signup = function () {
-
         $http.post('/api/user/signup', {username: $scope.signupUser, email: $scope.signupEmail, password: $scope.signupPassword}).
             success(loggedIn).error(notSignedup);
     }
-
 }
 
