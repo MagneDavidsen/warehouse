@@ -5,12 +5,12 @@
 function StatsCtrl($scope, sharedService, $http ) {
     $scope.numRappers;
     $scope.numUsers;
-    $scope.numVotes;
+    $scope.numRatings;
 
     $http.get('api/stats').success(function(data){
         $scope.numRappers = data.numRappers;
         $scope.numUsers = data.numUsers;
-        $scope.numVotes = data.numVotes;
+        $scope.numRatings = data.numRatings;
 
     })
 }

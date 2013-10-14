@@ -3,7 +3,7 @@ package nbrno
 import scala.slick.driver.PostgresDriver.simple._
 import scala.slick.session.Database
 import Database.threadLocalSession
-import nbrno.domain.{Stats, Rating, Rapper, User}
+import nbrno.domain.{Rating, Rapper, User}
 import com.lambdaworks.crypto.SCryptUtil
 import javax.sql.DataSource
 import java.sql.Timestamp
@@ -127,10 +127,9 @@ class DatabaseHandler(dataSource : DataSource) {
 
   def getStats = {
     Database.forDataSource(dataSource) withSession {
-      val numRappers = (for{r <- Rappers} yield r.length).first
-      val numUsers = (for{r <- Users} yield r.length).first
-      val numRatings = (for{r <- Ratings} yield r.length).first
-
+      val numRappers = Query(Rappers.length).first
+      val numUsers = Query(Users.length).first
+      val numRatings = Query(Ratings.length).first
 
       HashMap("numRappers" -> numRappers, "numUsers" -> numUsers, "numRatings" -> numRatings)
     }

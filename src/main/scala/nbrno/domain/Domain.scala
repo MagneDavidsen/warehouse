@@ -7,4 +7,3 @@ case class User(id:Option[Int], username:String, email:Option[String], password:
 case class Rapper(id:Int, name:String, score:Option[Int], createdAt:Timestamp)
 case class Rating(id:Option[Int], userId:Int, rapperId:Int, rating:Int, updatedAt:Timestamp)
 case class Vote(voteUp:Boolean)
-case class Stats(numRappers:Int, numUsers:Int, numVotes:Int)

@@ -99,4 +99,12 @@ class DatabaseHandler$Test extends FunSuite with BeforeAndAfter with BeforeAndAf
 
     assert(dbHandler.getVotes(user1.username).length == 3)
   }
+
+  test("stats returns the right numbers"){
+    val stats = dbHandler.getStats
+
+    assert(stats.get("numRappers") === Some(3))
+    assert(stats.get("numUsers") === Some(2))
+    assert(stats.get("numVotes") === Some(0))
+  }
 }
