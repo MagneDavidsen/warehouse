@@ -1,9 +1,16 @@
 language: scala
 scala:
-  - "2.10.0"
-  - "2.10.1"
-  - "2.10.2"
+- 2.10.0
+- 2.10.1
+- 2.10.2
 jdk:
-  - oraclejdk7
-  - openjdk7
-  - openjdk6
+- oraclejdk7
+- openjdk7
+- openjdk6
+deploy:
+  provider: heroku
+  api_key:
+    secure: R41ok8VmNdNlOgnLq6Or409kY+InindWAdJBuiRTW94rpkBRPAIMr14D04iEvVqCXi0wzSO7iFr/WSjCA0MseuFTt8WUPBMp/U0P+XddDAyX5UXc/BN1SLJg7efcPVPn/QksHbvTSiUcU+ZJQSjN7HrcMZmj1Mh93xwKnbNRw4s=
+  app: nbrno
+  on:
+    repo: MagneDavidsen/nbrno
