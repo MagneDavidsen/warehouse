@@ -44,7 +44,7 @@ object NbrnoServer extends App {
   val dbHandler : DatabaseHandler = new DatabaseHandler(getDataSource)
 
   Http(Properties.envOrElse("PORT", "8081").toInt).resources(new URL(getClass().getResource("/www/"), "."))
-    .filter(RappersPlan).filter(UserPlan).run()
+    .filter(RappersPlan).filter(UserPlan).filter(StatsPlan).run()
 
 }
 

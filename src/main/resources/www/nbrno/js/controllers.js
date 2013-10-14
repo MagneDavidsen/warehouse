@@ -2,6 +2,19 @@
 
 /* Controllers */
 
+function StatsCtrl($scope, sharedService, $http ) {
+    $scope.numRappers;
+    $scope.numUsers;
+    $scope.numVotes;
+
+    $http.get('api/stats').success(function(data){
+        $scope.numRappers = data.numRappers;
+        $scope.numUsers = data.numUsers;
+        $scope.numVotes = data.numVotes;
+
+    })
+}
+
 function RapperListCtrl($scope, sharedService, $http ) {
     $scope.rappers;
     $scope.predicate = ["score", "-name"];

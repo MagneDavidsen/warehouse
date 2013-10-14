@@ -3,11 +3,12 @@ package nbrno
 import scala.slick.driver.PostgresDriver.simple._
 import scala.slick.session.Database
 import Database.threadLocalSession
-import nbrno.domain.{Rating, Rapper, User}
+import nbrno.domain.{Stats, Rating, Rapper, User}
 import com.lambdaworks.crypto.SCryptUtil
 import javax.sql.DataSource
 import java.sql.Timestamp
 import java.util.Date
+import scala.collection.immutable.HashMap
 
 class DatabaseHandler(dataSource : DataSource) {
 
@@ -112,7 +113,7 @@ class DatabaseHandler(dataSource : DataSource) {
     }
   }
 
-  def vote(userId : Int, rapperId : Int, voteUp : Boolean){
+  def vote(userId : Int, rapperId : Int, voteUp : Boolean) = {
     Database.forDataSource(dataSource) withSession {
       val points : Int = if(voteUp) 1 else -1
       val query =  for{
@@ -121,6 +122,17 @@ class DatabaseHandler(dataSource : DataSource) {
       val rating : Option[Rating] = query.firstOption
       if(rating.isDefined) updateRating(rating.get, points)
       else createRating(userId, rapperId, points)
+    }
+  }
+
+  def getStats = {
+    Database.forDataSource(dataSource) withSession {
+      val numRappers = (for{r <- Rappers} yield r.length).first
+      val numUsers = (for{r <- Users} yield r.length).first
+      val numRatings = (for{r <- Ratings} yield r.length).first
+
+
+      HashMap("numRappers" -> numRappers, "numUsers" -> numUsers, "numRatings" -> numRatings)
     }
   }
 

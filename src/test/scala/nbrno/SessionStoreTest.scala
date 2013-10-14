@@ -36,5 +36,4 @@ class SessionStoreTest extends FunSuite {
     sessionStore.removeUser(token5)
     assert(sessionStore.getUser(token5) == None)
   }
-
 }

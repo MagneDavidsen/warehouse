@@ -10,6 +10,18 @@ import unfiltered.response.ResponseString
 import org.slf4j.{LoggerFactory, Logger}
 import unfiltered.Cookie
 
+object StatsPlan extends Plan {
+  implicit val formats = DefaultFormats
+  val logger : Logger = LoggerFactory.getLogger("nbrno.StatsPlan")
+  val dbHandler : DatabaseHandler = NbrnoServer.dbHandler
+
+  def intent = {
+    case GET(_) & Path("/api/stats") => {
+      JsonContent ~> ResponseString(write(dbHandler.getStats))
+    }
+  }
+}
+
 object RappersPlan extends Plan {
   implicit val formats = DefaultFormats
   val logger : Logger = LoggerFactory.getLogger("nbrno.RappersPlan")
