@@ -16,7 +16,7 @@ class DatabaseHandler(dataSource : DataSource) {
   object Rappers extends Table[Rapper]("rappers") {
     def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     def name = column[String]("name")
-    def createdAt = column[Timestamp]("created_at")
+    def createdAt = column[Timestamp]("created_at", O.Default(now))
     def * = id ~ name ~ createdAt <> ({t => Rapper(t._1, t._2, None, t._3)}, {(r:Rapper) => Some(r.id, r.name, r.createdAt)})
   }
 
@@ -34,8 +34,7 @@ class DatabaseHandler(dataSource : DataSource) {
     def email = columnToOptionColumn(column[String]("email"))
     def passhash = columnToOptionColumn(column[String]("passhash"))
     def createdFromIp = columnToOptionColumn(column[String]("created_from_ip"))
-    def createdAt = columnToOptionColumn(column[Timestamp]("created_at"))
-
+    def createdAt = columnToOptionColumn(column[Timestamp]("created_at", O.Default(now)))
 
     def * = id ~ username ~ email ~ passhash ~ createdFromIp ~ createdAt <> (UserObject.fromRow _, UserObject.toRow _)
     def forInsert = username ~ email ~ passhash ~ createdFromIp <>
