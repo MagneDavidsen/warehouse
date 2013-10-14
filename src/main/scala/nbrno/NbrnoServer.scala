@@ -8,6 +8,7 @@ import java.util.UUID
 import nbrno.domain.User
 import javax.sql.DataSource
 import org.postgresql.ds.{PGSimpleDataSource}
+import unfiltered.Cookie
 
 object NbrnoServer extends App {
 
@@ -58,6 +59,12 @@ class SessionStore(var map:immutable.HashMap[String, User]){
   }
 
   def getUser(token : String) : Option[User] = map.get(token)
+  def getUserFromCookie(cookie : Option[Cookie]) : Option[User] = {
+    cookie match {
+      case Some(cookie) => getUser(cookie.value)
+      case None => None
+    }
+  }
   def removeUser(token : String) = map-=(token)
   def size() : Int = map.size
 }

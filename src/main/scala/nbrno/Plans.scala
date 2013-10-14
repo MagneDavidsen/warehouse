@@ -17,14 +17,13 @@ object RappersPlan extends Plan {
 
   def intent = {
     case GET(_) & Cookies(cookies) & Path("/api/rappers")  => {
-      val user : Option[User] = NbrnoServer.sessionStore.getUser(cookies("SESSION_ID").get.value)
+      val user = NbrnoServer.sessionStore.getUserFromCookie(cookies("SESSION_ID"))
       val rappersString = write(dbHandler.getRappersWithTotalScore)
       var votesString = ""
       user match {
         case Some(value) => votesString = write(dbHandler.getVotes(user.get.username))
         case None => votesString = "[]"
       }
-
       ResponseString("{\"rappers\": " ++ rappersString ++ ", \"votes\": " ++ votesString ++ "}")
     }
 
