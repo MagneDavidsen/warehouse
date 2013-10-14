@@ -8,7 +8,7 @@ import java.util.UUID
 import nbrno.domain.User
 import scala.collection.immutable.HashMap
 import javax.sql.DataSource
-import org.postgresql.ds.PGPoolingDataSource
+import org.postgresql.ds.{PGSimpleDataSource}
 
 object NbrnoServer extends App {
 
@@ -16,8 +16,7 @@ object NbrnoServer extends App {
   val sessionStore : SessionStore = new SessionStore(new immutable.HashMap[String, User])
 
   val dataSource: DataSource = {
-    val ds = new PGPoolingDataSource
-    ds.setDataSourceName("nbrno")
+    val ds = new PGSimpleDataSource
     ds.setDatabaseName("nbrno")
     ds.setUser(Properties.envOrElse("DB_USER", "clocking"))
     ds.setPassword(Properties.envOrElse("DB_PASSWORD", "clocking"))

@@ -1,7 +1,7 @@
 package nbrno
 
 import javax.sql.DataSource
-import org.postgresql.ds.PGPoolingDataSource
+import org.postgresql.ds.{PGSimpleDataSource}
 import scala.util.Properties
 import scala.slick.driver.PostgresDriver.simple._
 import nbrno.domain.Rapper
@@ -11,8 +11,7 @@ import scala.slick.session.Database
 object Migration extends App {
 
   val dataSource: DataSource = {
-    val ds = new PGPoolingDataSource
-    ds.setDataSourceName("nbrno")
+    val ds = new PGSimpleDataSource
     ds.setDatabaseName("nbrno")
     ds.setUser(Properties.envOrElse("DB_USER", "clocking"))
     ds.setPassword(Properties.envOrElse("DB_PASSWORD", "clocking"))
@@ -35,4 +34,6 @@ object Migration extends App {
   val lars = new Rapper(3, "Lars Vaular", Some(0), Timestamp.valueOf("2013-10-13 13:37:00"))
 
   dbHandler.Rappers.insertAll(rsp, chirag, lars)
+
+  session.close()
 }
