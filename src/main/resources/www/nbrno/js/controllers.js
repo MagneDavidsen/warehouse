@@ -80,6 +80,7 @@ function RapperListCtrl($scope, sharedService, $http ) {
 function LoginCtrl($scope, sharedService, $http, $cookies) {
 
     $scope.showLogin = false;
+    $scope.showLogout = false;
 
     $scope.loginUser = ""
     $scope.loginPassword = ""
@@ -100,9 +101,10 @@ function LoginCtrl($scope, sharedService, $http, $cookies) {
     });
 
     function loggedIn(data, status, header){
-        console.log("logged in")
+        console.log("logged in");
 
-        $scope.showLogin = false
+        $scope.showLogin = false;
+        $scope.showLogout = true;
 
         sharedService.votes = data;
         sharedService.prepForBroadcast("loggedIn")
@@ -114,6 +116,7 @@ function LoginCtrl($scope, sharedService, $http, $cookies) {
 
     function loggedOut(data, status, header){
         console.log("logged out")
+        $scope.showLogout = false;
     }
 
     function notLoggedOut(data, status, header){
