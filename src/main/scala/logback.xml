@@ -8,6 +8,8 @@
         </encoder>
     </appender>
 
+    <logger name="scala.slick.compiler" level="WARN" />
+
     <root level="debug">
         <appender-ref ref="STDOUT" />
     </root>
