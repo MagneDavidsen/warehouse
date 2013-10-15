@@ -105,6 +105,6 @@ class DatabaseHandler$Test extends FunSuite with BeforeAndAfter with BeforeAndAf
 
     assert(stats.get("numRappers") === Some(3))
     assert(stats.get("numUsers") === Some(2))
-    assert(stats.get("numVotes") === Some(0))
+    assert(stats.get("numVotes") === None)
   }
 }
