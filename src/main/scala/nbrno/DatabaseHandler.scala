@@ -12,12 +12,10 @@ import scala.collection.immutable.HashMap
 
 class DatabaseHandler(dataSource : DataSource) {
 
-  def now : Timestamp = new Timestamp(new Date().getTime)
-
   object Rappers extends Table[Rapper]("rappers") {
     def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     def name = column[String]("name")
-    def createdAt = column[Timestamp]("created_at", O.Default(now))
+    def createdAt = column[Timestamp]("created_at")
     def * = id ~ name ~ createdAt <> ({t => Rapper(t._1, t._2, None, t._3)}, {(r:Rapper) => Some(r.id, r.name, r.createdAt)})
   }
 
@@ -35,11 +33,11 @@ class DatabaseHandler(dataSource : DataSource) {
     def email = columnToOptionColumn(column[String]("email"))
     def passhash = columnToOptionColumn(column[String]("passhash"))
     def createdFromIp = columnToOptionColumn(column[String]("created_from_ip"))
-    def createdAt = columnToOptionColumn(column[Timestamp]("created_at", O.Default(now)))
+    def createdAt = columnToOptionColumn(column[Timestamp]("created_at"))
 
     def * = id ~ username ~ email ~ passhash ~ createdFromIp ~ createdAt <> (UserObject.fromRow _, UserObject.toRow _)
-    def forInsert = username ~ email ~ passhash ~ createdFromIp <>
-      ({ t => User(None, t._1, t._2, None, t._3, t._4, None)}, { (u: User) => Some((u.username, u.email, u.passhash, u.createdFromIp))})
+    def forInsert = username ~ email ~ passhash ~ createdFromIp ~ createdAt <>
+      ({ t => User(None, t._1, t._2, None, t._3, t._4, None)}, { (u: User) => Some((u.username, u.email, u.passhash, u.createdFromIp, u.createdAt))})
   }
 
   object RatingObject {
@@ -82,13 +80,13 @@ class DatabaseHandler(dataSource : DataSource) {
      }}
 
   def createUser(user : User, ip : String): User = {
+    val now = new Timestamp(new Date().getTime)
     Database.forDataSource(dataSource) withSession {
       val passhash = SCryptUtil.scrypt(user.password.get, 512, 8 ,8)
-
       val userId = Users.forInsert returning Users.id insert
-        User(None, user.username, user.email, None, Some(passhash), Some(ip), None)
+        User(None, user.username, user.email, None, Some(passhash), Some(ip), Some(now))
 
-      User(userId, user.username, user.email, None, None,Some(ip), None)
+      User(userId, user.username, user.email, None, None,Some(ip), Some(now))
     }
   }
 
@@ -137,9 +135,9 @@ class DatabaseHandler(dataSource : DataSource) {
 
   private def updateRating(rating : Rating, points : Int){
     val q = for { r <- Ratings if r.id === rating.id } yield {r.rating ~ r.updatedAt}
-    q.update(points, now)
+    q.update(points, new Timestamp(new Date().getTime))
   }
 
   private def createRating(userId : Int, rapperId : Int, points : Int) =
-    Ratings.forInsert insert Rating(None, userId, rapperId, points, now)
+    Ratings.forInsert insert Rating(None, userId, rapperId, points, new Timestamp(new Date().getTime))
 }
