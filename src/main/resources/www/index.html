@@ -20,12 +20,17 @@
 </head>
 <body>
 
-<div class="page-header" ng-controller="LoginCtrl" ng-show="showLogout">
-    <a href="#" ng-click="logout()">Logg ut</a>
-</div>
+<div class="page-header" ng-controller="LoginCtrl" >
 
-<div class="page-header" ng-controller="LoginCtrl" ng-show="showLogin">
-    <div class="container">
+    <div class="loggedinbar container" ng-show="loggedIn">
+        Du er logget inn som <b>{{loginUser}}</b> - <a  href="#" ng-click="logout()">Logg ut</a>
+    </div>
+
+    <div class="loggedoutbar container" ng-show="!loggedIn && !showLogin">
+        <a  href="#" ng-click="showLogin=true">Logg inn</a>
+    </div>
+
+    <div class="container" ng-show="showLogin">
         <div class="row">
             <h1 class="text-center">Du må logge inn for å stemme</h1>
 

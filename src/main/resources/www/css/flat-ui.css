@@ -3753,3 +3753,16 @@ body.vjs-full-window {
 .mal {
   margin-left: 20px;
 }
+
+
+.loggedinbar{
+     padding-bottom: 5px;
+     padding-top: 5px;
+     text-align: right;
+ }
+
+.loggedoutbar{
+    padding-bottom: 5px;
+    padding-top: 5px;
+    text-align: left;
+}

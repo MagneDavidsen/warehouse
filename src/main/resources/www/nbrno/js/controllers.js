@@ -27,7 +27,6 @@ function RapperListCtrl($scope, sharedService, $http ) {
         })
 
     function voted(data){
-
         console.log("voted")
     }
 
@@ -80,7 +79,7 @@ function RapperListCtrl($scope, sharedService, $http ) {
 function LoginCtrl($scope, sharedService, $http, $cookies) {
 
     $scope.showLogin = false;
-    $scope.showLogout = false;
+    $scope.loggedIn = $cookies.SESSION_ID != null && $cookies.SESSION_ID != "" && $cookies.SESSION_ID != undefined
 
     $scope.loginUser = ""
     $scope.loginPassword = ""
@@ -90,6 +89,9 @@ function LoginCtrl($scope, sharedService, $http, $cookies) {
     $scope.signupPassword = ""
 
     $scope.error = ""
+
+    //TODO: implement automatic login with cookie
+
 
     $scope.$on('handleBroadcast', function() {
         switch(sharedService.message)
@@ -104,7 +106,7 @@ function LoginCtrl($scope, sharedService, $http, $cookies) {
         console.log("logged in");
 
         $scope.showLogin = false;
-        $scope.showLogout = true;
+        $scope.loggedIn = true;
 
         sharedService.votes = data;
         sharedService.prepForBroadcast("loggedIn")
@@ -116,7 +118,7 @@ function LoginCtrl($scope, sharedService, $http, $cookies) {
 
     function loggedOut(data, status, header){
         console.log("logged out")
-        $scope.showLogout = false;
+        $scope.loggedIn = false;
     }
 
     function notLoggedOut(data, status, header){
@@ -125,6 +127,12 @@ function LoginCtrl($scope, sharedService, $http, $cookies) {
 
     function notSignedup(data, status, header){
         $scope.error = "Feil brukernavn eller passord"
+    }
+
+    function loginAfterSignup(){
+        $scope.loginUser = $scope.signupUser;
+        $scope.loginPassword = $scope.signupPassword;
+        $scope.login();
     }
 
     $scope.login = function () {
@@ -139,7 +147,7 @@ function LoginCtrl($scope, sharedService, $http, $cookies) {
 
     $scope.signup = function () {
         $http.post('/api/user/signup', {username: $scope.signupUser, email: $scope.signupEmail, password: $scope.signupPassword}).
-            success(loggedIn).error(notSignedup);
+            success(loginAfterSignup).error(notSignedup);
     }
 }
 
