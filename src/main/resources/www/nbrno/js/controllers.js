@@ -78,8 +78,10 @@ function RapperListCtrl($scope, sharedService, $http ) {
 
 function LoginCtrl($scope, sharedService, $http, $cookies) {
 
-    $scope.showLogin = false;
-    $scope.loggedIn = $cookies.SESSION_ID != null && $cookies.SESSION_ID != "" && $cookies.SESSION_ID != undefined
+
+
+    $scope.showLogin;
+    $scope.loggedIn;
 
     $scope.loginUser = ""
     $scope.loginPassword = ""
@@ -101,6 +103,10 @@ function LoginCtrl($scope, sharedService, $http, $cookies) {
                 break;
         }
     });
+
+    function isEmptyOrUndefined(text){
+        return text == null || text == "" || text == undefined
+    }
 
     function loggedIn(data, status, header){
         console.log("logged in");
@@ -149,5 +155,12 @@ function LoginCtrl($scope, sharedService, $http, $cookies) {
         $http.post('/api/user/signup', {username: $scope.signupUser, email: $scope.signupEmail, password: $scope.signupPassword}).
             success(loginAfterSignup).error(notSignedup);
     }
+
+    (function init(){
+        if(!isEmptyOrUndefined($cookies.SESSION){
+
+        }
+    })();
+
 }
 
