@@ -9,6 +9,9 @@ import org.json4s.native.Serialization.{read, write}
 import unfiltered.response.ResponseString
 import org.slf4j.{LoggerFactory, Logger}
 import unfiltered.Cookie
+import org.json4s.DefaultReaders.JObjectReader
+import org.json4s.JsonAST.JObject
+import scala.collection.immutable.HashMap
 
 object StatsPlan extends Plan {
   implicit val formats = DefaultFormats
@@ -84,7 +87,7 @@ object UserPlan extends Plan {
               if (dbHandler.availableUsername(user.username)) {
                 val newUser : User = dbHandler.createUser(user, req.remoteAddr)
                 val sessionId : String = NbrnoServer.sessionStore.addUser(newUser)
-                Ok ~> SetCookies(Cookie("SESSION_ID", sessionId, None, Some("/")))
+                Ok ~> SetCookies(Cookie("SESSION_ID", sessionId, None, Some("/"), Some(1000)))
               }
               else BadRequest ~> ResponseString("Username not available")
             }
@@ -118,6 +121,33 @@ object UserPlan extends Plan {
       }
       case _ => MethodNotAllowed
     }
+
+    case req@Path("/api/user/login/cookie") =>
+      val body : String = Body.string(req)
+      logger.info("RequestBody: " ++ body)
+      req match {
+        case POST(_) => req match {
+          case RequestContentType("application/json;charset=UTF-8") => req match {
+            case Accepts.Json(_) =>
+              Ok ~> JsonContent ~> {
+                val cookie = scala.util.parsing.json.JSON.parseFull(body)
+                 cookie match {
+                  case Some(map : Map[String, String]) => {
+                    val user = NbrnoServer.sessionStore.getUser(map.get("SESSION_ID").get)
+                    user match {
+                      case Some(user) => Ok ~> ResponseString(write(user))
+                      case None => BadRequest ~> ResponseString("No user found")
+                    }
+                  }
+                  case None => BadRequest ~> ResponseString("No SESSION_ID")
+                }
+              }
+            case _ => NotAcceptable
+          }
+          case _ => UnsupportedMediaType
+        }
+        case _ => MethodNotAllowed
+      }
 
     case req@Path("/api/user/logout") =>
       val body : String = Body.string(req)

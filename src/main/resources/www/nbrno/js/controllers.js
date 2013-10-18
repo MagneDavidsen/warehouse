@@ -104,8 +104,8 @@ function LoginCtrl($scope, sharedService, $http, $cookies) {
         }
     });
 
-    function isEmptyOrUndefined(text){
-        return text == null || text == "" || text == undefined
+    function isNotEmptyOrUndefined(text){
+        return text != null && text != "" && text != undefined;
     }
 
     function loggedIn(data, status, header){
@@ -156,11 +156,9 @@ function LoginCtrl($scope, sharedService, $http, $cookies) {
             success(loginAfterSignup).error(notSignedup);
     }
 
-    (function init(){
-        if(!isEmptyOrUndefined($cookies.SESSION){
-
-        }
-    })();
-
+    if(isNotEmptyOrUndefined($cookies.SESSION_ID)){
+        $http.post('/api/user/login/cookie',{SESSION_ID: $cookies.SESSION_ID}).
+            success(loggedIn).error(notLoggedIn);
+    }
 }
 
