@@ -1,6 +1,4 @@
 import sbt._
-import Keys._
-import com.github.bigtoast.sbtliquibase.LiquibasePlugin._
 import scala.util.Properties
 
 object NbrnoBuild extends Build {
@@ -13,7 +11,5 @@ object NbrnoBuild extends Build {
     base = file("."),
     settings = Project.defaultSettings ++
       Seq(environment := realenv)
-
-
   )
 }
