@@ -73,6 +73,8 @@ object UserPlan extends Plan {
   val logger : Logger = LoggerFactory.getLogger("nbrno.UserPlan")
   val dbHandler : DatabaseHandler = NbrnoServer.dbHandler
 
+  val oneYear: Int = 31536000
+
   def intent = {
 
     case req@Path("/api/user/signup") =>
@@ -87,7 +89,7 @@ object UserPlan extends Plan {
               if (dbHandler.availableUsername(user.username)) {
                 val newUser : User = dbHandler.createUser(user, req.remoteAddr)
                 val sessionId : String = NbrnoServer.sessionStore.addUser(newUser)
-                Ok ~> SetCookies(Cookie("SESSION_ID", sessionId, None, Some("/"), Some(1000)))
+                Ok ~> SetCookies(Cookie("SESSION_ID", sessionId, None, Some("/"), Some(oneYear)))
               }
               else BadRequest ~> ResponseString("Username not available")
             }
@@ -110,7 +112,7 @@ object UserPlan extends Plan {
               val validatedUser = dbHandler.validateUser(user.username, user.password.get)
               if (validatedUser.isDefined) {
                 val sessionId : String = NbrnoServer.sessionStore.addUser(validatedUser.get)
-                Ok ~> JsonContent ~> SetCookies(Cookie("SESSION_ID", sessionId, None, Some("/"))) ~>
+                Ok ~> SetCookies(Cookie("SESSION_ID", sessionId, None, Some("/"), Some(oneYear)))`` ~>
                   ResponseString(write(dbHandler.getVotes(validatedUser.get.username)))
               }
               else BadRequest ~> ResponseString("Wrong username or password")
@@ -139,7 +141,7 @@ object UserPlan extends Plan {
                       case None => BadRequest ~> ResponseString("No user found")
                     }
                   }
-                  case None => BadRequest ~> ResponseString("No SESSION_ID")
+                  case _ => BadRequest ~> ResponseString("No SESSION_ID")
                 }
               }
             case _ => NotAcceptable
