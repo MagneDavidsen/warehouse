@@ -5,11 +5,21 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import nbrno.domain.User
 import scala.collection.immutable
+import javax.sql.DataSource
+import org.h2.jdbcx.JdbcDataSource
 
 @RunWith(classOf[JUnitRunner])
 class SessionStoreTest extends FunSuite {
 
-  val sessionStore : SessionStore = new SessionStore(new immutable.HashMap[String, User])
+  val dataSource: DataSource = {
+    val ds = new JdbcDataSource
+    ds.setURL("jdbc:h2:mem:test1")
+    ds
+  }
+
+  var dbHandler = new DatabaseHandler(dataSource)
+
+  val sessionStore : SessionStore = new SessionStore(new immutable.HashMap[String, User], dbHandler)
 
   test("one is one"){
     assert(1 == 1)

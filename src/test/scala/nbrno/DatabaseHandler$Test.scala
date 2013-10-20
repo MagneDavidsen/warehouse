@@ -1,3 +1,4 @@
+
 package nbrno
 
 import scala.slick.driver.H2Driver.simple._
@@ -19,6 +20,8 @@ class DatabaseHandler$Test extends FunSuite with BeforeAndAfter with BeforeAndAf
   val rapper2 = new Rapper(2, "rapper-2", Some(0), Timestamp.valueOf("2013-06-20 13:37:00"))
   val rapper3 = new Rapper(3, "rapper-3", Some(0), Timestamp.valueOf("2013-06-20 13:37:00"))
 
+  val sessionId: String = "session-id"
+
   val dataSource: DataSource = {
     val ds = new JdbcDataSource
     ds.setURL("jdbc:h2:mem:test1")
@@ -30,7 +33,7 @@ class DatabaseHandler$Test extends FunSuite with BeforeAndAfter with BeforeAndAf
 
   override def beforeAll {
     //create all tables
-    (dbHandler.Rappers.ddl ++ dbHandler.Ratings.ddl ++ dbHandler.Users.ddl).create
+    (dbHandler.Sessions.ddl ++ dbHandler.Rappers.ddl ++ dbHandler.Ratings.ddl ++ dbHandler.Users.ddl).create
 
     //populate rappers and users
     dbHandler.Rappers.insertAll(rapper1, rapper2, rapper3)
@@ -106,5 +109,18 @@ class DatabaseHandler$Test extends FunSuite with BeforeAndAfter with BeforeAndAf
     assert(stats.get("numRappers") === Some(3))
     assert(stats.get("numUsers") === Some(2))
     assert(stats.get("numVotes") === None)
+  }
+
+  test("save and retrieve session works"){
+    dbHandler.saveSession(sessionId, user1.id.get)
+
+    assert(dbHandler.retrieveSession(sessionId).get.id === user1.id)
+  }
+
+  test("remove session works"){
+    dbHandler.saveSession(sessionId, user1.id.get)
+    dbHandler.removeSession(sessionId)
+
+    assert(dbHandler.retrieveSession(sessionId) === None)
   }
 }

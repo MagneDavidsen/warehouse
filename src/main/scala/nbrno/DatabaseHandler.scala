@@ -19,6 +19,15 @@ class DatabaseHandler(dataSource : DataSource) {
     def * = id ~ name ~ createdAt <> ({t => Rapper(t._1, t._2, None, t._3)}, {(r:Rapper) => Some(r.id, r.name, r.createdAt)})
   }
 
+  object Sessions extends Table[(Int, String, Int, Timestamp)]("sessions") {
+    def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
+    def sessionId = column[String]("session_id")
+    def userId = column[Int]("user_id")
+    def createdAt = column[Timestamp]("created_at")
+    def * = id ~ sessionId ~ userId ~ createdAt
+    def forInsert = sessionId ~ userId ~ createdAt
+  }
+
   object UserObject {
     def fromRow(id: Option[Int], username: String, email:Option[String], passhash: Option[String],
                 createdFromIp:Option[String],createdAt:Option[Timestamp]): User =
@@ -79,6 +88,15 @@ class DatabaseHandler(dataSource : DataSource) {
           case (rapper, rating) => if(rating.isDefined) rating.get else 0 }.sum), rr.head._1.createdAt))}.toList
      }}
 
+  def getUser(userId : Int) : Option[User] = {
+    Database.forDataSource(dataSource) withSession {
+      val query = for{
+        u <- Users if u.id === userId
+      } yield u
+      query.firstOption
+    }
+  }
+
   def createUser(user : User, ip : String): User = {
     val now = new Timestamp(new Date().getTime)
     Database.forDataSource(dataSource) withSession {
@@ -130,6 +148,38 @@ class DatabaseHandler(dataSource : DataSource) {
       val numRatings = Query(Ratings.length).first
 
       HashMap("numRappers" -> numRappers, "numUsers" -> numUsers, "numRatings" -> numRatings)
+    }
+  }
+
+  def saveSession(sessionId : String, userId : Int) = {
+    val now = new Timestamp(new Date().getTime)
+    Database.forDataSource(dataSource) withSession {
+      Sessions.forInsert insert(sessionId, userId, now)
+    }
+  }
+
+  def retrieveSession(sessionId : String) : Option[User] = {
+    Database.forDataSource(dataSource) withSession {
+      val query = for{
+        s <- Sessions if s.sessionId === sessionId
+      } yield s.userId
+
+      val userId = query.firstOption
+
+      userId match{
+        case Some( id : Int) => getUser(id)
+        case None => None
+      }
+    }
+  }
+
+  def removeSession(sessionId : String) = {
+    Database.forDataSource(dataSource) withSession {
+      val query = for{
+        s <- Sessions if s.sessionId === sessionId
+      } yield s
+
+      query.delete
     }
   }
 
