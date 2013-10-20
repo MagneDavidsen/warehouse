@@ -20,12 +20,6 @@ function RapperListCtrl($scope, sharedService, $http ) {
     $scope.predicate = ["score", "-name"];
     $scope.unauthorizedVote;
 
-    $http.get('/api/rappers').
-        success(function(data){
-            $scope.rappers=data.rappers;
-            if(data.votes.length > 0) updateRappersWithVotes($scope.rappers, data.votes);
-        })
-
     function voted(data){
         console.log("voted")
     }
@@ -74,6 +68,18 @@ function RapperListCtrl($scope, sharedService, $http ) {
                 break;
         }
     });
+
+    function getRappers(){
+        $http.get('/api/rappers').
+            success(function(data){
+                $scope.rappers=data.rappers;
+                if(data.votes.length > 0){
+                    updateRappersWithVotes($scope.rappers, data.votes);
+                }
+            });
+    }
+
+    getRappers();
 }
 
 function LoginCtrl($scope, sharedService, $http, $cookies) {
@@ -108,13 +114,20 @@ function LoginCtrl($scope, sharedService, $http, $cookies) {
         return text != null && text != "" && text != undefined;
     }
 
-    function loggedIn(data, status, header){
+    function loggedInCookie(data, status, header){
+        console.log("logged in cookie");
+
+        $scope.loginUser = data.username;
+        $scope.showLogin = false;
+        $scope.loggedIn = true;
+    }
+
+    function loggedIn(){
         console.log("logged in");
 
         $scope.showLogin = false;
         $scope.loggedIn = true;
 
-        sharedService.votes = data;
         sharedService.prepForBroadcast("loggedIn")
     }
 
@@ -158,7 +171,7 @@ function LoginCtrl($scope, sharedService, $http, $cookies) {
 
     if(isNotEmptyOrUndefined($cookies.SESSION_ID)){
         $http.post('/api/user/login/cookie',{SESSION_ID: $cookies.SESSION_ID}).
-            success(loggedIn).error(notLoggedIn);
+            success(loggedInCookie).error(notLoggedIn);
     }
 }
 
