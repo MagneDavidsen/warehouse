@@ -9,9 +9,6 @@ import org.json4s.native.Serialization.{read, write}
 import unfiltered.response.ResponseString
 import org.slf4j.{LoggerFactory, Logger}
 import unfiltered.Cookie
-import org.json4s.DefaultReaders.JObjectReader
-import org.json4s.JsonAST.JObject
-import scala.collection.immutable.HashMap
 
 object StatsPlan extends Plan {
   implicit val formats = DefaultFormats
@@ -112,8 +109,7 @@ object UserPlan extends Plan {
               val validatedUser = dbHandler.validateUser(user.username, user.password.get)
               if (validatedUser.isDefined) {
                 val sessionId : String = NbrnoServer.sessionStore.addUser(validatedUser.get)
-                Ok ~> SetCookies(Cookie("SESSION_ID", sessionId, None, Some("/"), Some(oneYear)))`` ~>
-                  ResponseString(write(dbHandler.getVotes(validatedUser.get.username)))
+                Ok ~> SetCookies(Cookie("SESSION_ID", sessionId, None, Some("/"), Some(oneYear)))
               }
               else BadRequest ~> ResponseString("Wrong username or password")
             }
@@ -137,7 +133,10 @@ object UserPlan extends Plan {
                   case Some(map : Map[String, String]) => {
                     val user = NbrnoServer.sessionStore.getUser(map.get("SESSION_ID").get)
                     user match {
-                      case Some(user) => Ok ~> ResponseString(write(user))
+                      case Some(user) =>{
+                        val noPassHashUser = user.copy(passhash=None, createdFromIp = None)
+                        Ok ~> ResponseString(write(noPassHashUser))
+                      }
                       case None => BadRequest ~> ResponseString("No user found")
                     }
                   }
@@ -171,5 +170,3 @@ object UserPlan extends Plan {
       }
   }
 }
-
-
