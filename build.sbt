@@ -48,4 +48,6 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "1.9.1" % "test"
 
 libraryDependencies += "junit" % "junit" % "4.10" % "test"
 
-libraryDependencies += "com.h2database" % "h2" % "1.3.173"
+libraryDependencies += "org.scalamock" %% "scalamock-scalatest-support" % "3.0.1" % "test"
+
+libraryDependencies += "com.h2database" % "h2" % "1.3.173" % "test"

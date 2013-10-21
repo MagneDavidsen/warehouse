@@ -151,7 +151,7 @@ class DatabaseHandler(dataSource : DataSource) {
     }
   }
 
-  def saveSession(sessionId : String, userId : Int) = {
+  def saveSession(sessionId : String, userId : Int){
     val now = new Timestamp(new Date().getTime)
     Database.forDataSource(dataSource) withSession {
       Sessions.forInsert insert(sessionId, userId, now)
@@ -173,12 +173,11 @@ class DatabaseHandler(dataSource : DataSource) {
     }
   }
 
-  def removeSession(sessionId : String) = {
+  def removeSession(sessionId : String){
     Database.forDataSource(dataSource) withSession {
       val query = for{
         s <- Sessions if s.sessionId === sessionId
       } yield s
-
       query.delete
     }
   }

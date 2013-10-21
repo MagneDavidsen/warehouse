@@ -1,15 +1,15 @@
 package nbrno
 
 import org.scalatest.FunSuite
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 import nbrno.domain.User
 import scala.collection.immutable
+import org.scalamock.scalatest.MockFactory
 import javax.sql.DataSource
+import org.scalamock.MockFactoryBase
 import org.h2.jdbcx.JdbcDataSource
 
-@RunWith(classOf[JUnitRunner])
-class SessionStoreTest extends FunSuite {
+
+class SessionStoreTest extends FunSuite with MockFactory with MockFactoryBase{
 
   val dataSource: DataSource = {
     val ds = new JdbcDataSource
@@ -17,32 +17,30 @@ class SessionStoreTest extends FunSuite {
     ds
   }
 
-  var dbHandler = new DatabaseHandler(dataSource)
-
-  val sessionStore : SessionStore = new SessionStore(new immutable.HashMap[String, User], dbHandler)
-
-  test("one is one"){
-    assert(1 == 1)
-
+  object MockDbHandler extends DatabaseHandler(dataSource = dataSource){
+    override def saveSession(s : String, i : Int ) = mockFunction[String, Int]
+    override def retrieveSession(s : String) = None
+    override def removeSession(s : String) = mockFunction[String]
   }
+
+  val sessionStore : SessionStore = new SessionStore(new immutable.HashMap[String, User], MockDbHandler )
 
   test("adding users works"){
 
-    val token1 : String = sessionStore.addUser(User(None, "user-1", None, None, None, None, None))
-    val token2 : String = sessionStore.addUser(User(None, "user-2", None, None, None, None, None))
-    val token3 : String = sessionStore.addUser(User(None, "user-3", None, None, None, None, None))
+    val token1 : String = sessionStore.addUser(User(Some(1), "user-1", None, None, None, None, None))
+    val token2 : String = sessionStore.addUser(User(Some(2), "user-2", None, None, None, None, None))
+    val token3 : String = sessionStore.addUser(User(Some(3), "user-3", None, None, None, None, None))
 
     assert(sessionStore.size() == 3)
-
   }
 
   test("getting users works"){
-    val token4 : String = sessionStore.addUser(User(None, "user-4", None, None, None, None, None))
+    val token4 : String = sessionStore.addUser(User(Some(4), "user-4", None, None, None, None, None))
     assert(sessionStore.getUser(token4).get.username == "user-4")
   }
 
   test("removing users works"){
-    val token5 : String = sessionStore.addUser(User(None, "user-5", None, None, None, None, None))
+    val token5 : String = sessionStore.addUser(User(Some(5), "user-5", None, None, None, None, None))
     sessionStore.removeUser(token5)
     assert(sessionStore.getUser(token5) == None)
   }
