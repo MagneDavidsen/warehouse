@@ -128,15 +128,27 @@ function LoginCtrl($scope, sharedService, $http, $cookies) {
         $scope.showLogin = false;
         $scope.loggedIn = true;
 
-        sharedService.prepForBroadcast("loggedIn")
+        sharedService.prepForBroadcast("loggedIn");
     }
 
     function notLoggedIn(data, status, header){
         $scope.error = "Feil brukernavn eller passord"
     }
 
+    function notLoggedInCookie(data, status, header){
+        console.log("could not log in with cookie");
+    }
+
     function loggedOut(data, status, header){
         console.log("logged out")
+
+        $scope.loginUser = ""
+        $scope.loginPassword = ""
+
+        $scope.signupUser = ""
+        $scope.signupEmail = ""
+        $scope.signupPassword = ""
+
         $scope.loggedIn = false;
     }
 
@@ -171,7 +183,7 @@ function LoginCtrl($scope, sharedService, $http, $cookies) {
 
     if(isNotEmptyOrUndefined($cookies.SESSION_ID)){
         $http.post('/api/user/login/cookie',{SESSION_ID: $cookies.SESSION_ID}).
-            success(loggedInCookie).error(notLoggedIn);
+            success(loggedInCookie).error(notLoggedInCookie);
     }
 }
 
