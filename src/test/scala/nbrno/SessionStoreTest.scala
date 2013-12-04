@@ -47,3 +47,4 @@ class SessionStoreTest extends FunSuite with MockFactory with MockFactoryBase wi
    sessionStore.getUser(token5) should be (None)
   }
 }
+

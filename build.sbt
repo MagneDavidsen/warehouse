@@ -12,6 +12,8 @@ resolvers += "coda" at "http://repo.codahale.com"
 
 resolvers += "sonatype-repo" at "http://oss.sonatype.org"
 
+resolvers += "sonatype-repo" at "http://oss.sonatype.org/content/repositories/snapshots"
+
 resolvers += "maven-repo" at "http://search.maven.org"
 
 resolvers += "jboss repo" at "http://repository.jboss.org/nexus/content/groups/public-jboss/"
@@ -51,3 +53,11 @@ libraryDependencies += "junit" % "junit" % "4.10" % "test"
 libraryDependencies += "org.scalamock" %% "scalamock-scalatest-support" % "3.0.1" % "test"
 
 libraryDependencies += "com.h2database" % "h2" % "1.3.173" % "test"
+
+libraryDependencies += "io.gatling" % "gatling-core" % "2.0.0-SNAPSHOT" % "test"
+
+libraryDependencies += "io.gatling" % "gatling-http" % "2.0.0-SNAPSHOT" % "test"
+
+libraryDependencies += "io.gatling" % "gatling-app" % "2.0.0-SNAPSHOT" % "test"
+
+libraryDependencies += "io.gatling.highcharts" % "gatling-charts-highcharts" % "2.0.0-SNAPSHOT" % "test"
