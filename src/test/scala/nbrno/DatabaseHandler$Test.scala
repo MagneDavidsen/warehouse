@@ -8,8 +8,9 @@ import scala.slick.session.Database
 import org.h2.jdbcx.JdbcDataSource
 import java.sql.Timestamp
 import nbrno.domain.{User, Rapper}
+import org.scalatest.matchers.ShouldMatchers
 
-class DatabaseHandler$Test extends FunSuite with BeforeAndAfter with BeforeAndAfterAll{
+class DatabaseHandler$Test extends FunSuite with ShouldMatchers with BeforeAndAfter with BeforeAndAfterAll{
 
   val user1 = new User(Some(1), "user-1", Some("email-1"), Some("password-1"), Some("hash-1"), Some("ip-1"),
     Some(Timestamp.valueOf("2013-06-20 13:37:00")))
@@ -122,5 +123,14 @@ class DatabaseHandler$Test extends FunSuite with BeforeAndAfter with BeforeAndAf
     dbHandler.removeSession(sessionId)
 
     assert(dbHandler.retrieveSession(sessionId) === None)
+  }
+
+  test("reset password sets password"){
+    val newPassword = "newPassword"
+
+    dbHandler.resetPassword("email-1", newPassword)
+
+    dbHandler.validateUser("user-1", newPassword) should not be (None)
+    dbHandler.validateUser("user-1", "password-1") should be (None)
   }
 }

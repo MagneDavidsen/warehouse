@@ -9,6 +9,7 @@ import org.json4s.native.Serialization.{read, write}
 import unfiltered.response.ResponseString
 import org.slf4j.{LoggerFactory, Logger}
 import unfiltered.Cookie
+import java.util.UUID
 
 object StatsPlan extends Plan {
   implicit val formats = DefaultFormats
@@ -43,25 +44,25 @@ object RappersPlan extends Plan {
       val body : String = Body.string(req)
       logger.info("RequestBody: " ++ body)
       req match {
-      case POST(_) & Cookies(cookies) => req match {
-        case RequestContentType("application/json;charset=UTF-8") => req match {
-          case Accepts.Json(_) =>
-            Ok ~> JsonContent ~> {
-              val vote : Vote = read[Vote](body)
-              val user : Option[User] = NbrnoServer.sessionStore.getUser(cookies("SESSION_ID").get.value)
-              //TODO: Ensure rapperId is int
-              if(user.isDefined){
-                dbHandler.vote(user.get.id.get, rapperId.toInt, vote.voteUp)
-                ResponseString("Vote registered")
+        case POST(_) & Cookies(cookies) => req match {
+          case RequestContentType("application/json;charset=UTF-8") => req match {
+            case Accepts.Json(_) =>
+              Ok ~> JsonContent ~> {
+                val vote : Vote = read[Vote](body)
+                val user : Option[User] = NbrnoServer.sessionStore.getUser(cookies("SESSION_ID").get.value)
+                //TODO: Ensure rapperId is int
+                if(user.isDefined){
+                  dbHandler.vote(user.get.id.get, rapperId.toInt, vote.voteUp)
+                  ResponseString("Vote registered")
+                }
+                else Unauthorized
               }
-              else Unauthorized
-            }
-          case _ => NotAcceptable
+            case _ => NotAcceptable
+          }
+          case _ => UnsupportedMediaType
         }
-        case _ => UnsupportedMediaType
+        case _ => MethodNotAllowed
       }
-      case _ => MethodNotAllowed
-    }
   }
 }
 
@@ -78,47 +79,47 @@ object UserPlan extends Plan {
       val body : String = Body.string(req)
       logger.info("RequestBody: " ++ body)
       req match {
-      case POST(_) => req match {
-        case RequestContentType("application/json;charset=UTF-8") => req match {
-          case Accepts.Json(_) =>
-            Ok ~> JsonContent ~> {
-              val user: User = read[User](body)
-              if (dbHandler.availableUsername(user.username)) {
-                val newUser : User = dbHandler.createUser(user, req.remoteAddr)
-                val sessionId : String = NbrnoServer.sessionStore.addUser(newUser)
-                Ok ~> SetCookies(Cookie("SESSION_ID", sessionId, None, Some("/"), Some(oneYear)))
+        case POST(_) => req match {
+          case RequestContentType("application/json;charset=UTF-8") => req match {
+            case Accepts.Json(_) =>
+              Ok ~> JsonContent ~> {
+                val user: User = read[User](body)
+                if (dbHandler.availableUsername(user.username)) {
+                  val newUser : User = dbHandler.createUser(user, req.remoteAddr)
+                  val sessionId : String = NbrnoServer.sessionStore.addUser(newUser)
+                  Ok ~> SetCookies(Cookie("SESSION_ID", sessionId, None, Some("/"), Some(oneYear)))
+                }
+                else BadRequest ~> ResponseString("Username not available")
               }
-              else BadRequest ~> ResponseString("Username not available")
-            }
-          case _ => NotAcceptable
+            case _ => NotAcceptable
+          }
+          case _ => UnsupportedMediaType
         }
-        case _ => UnsupportedMediaType
+        case _ => MethodNotAllowed
       }
-      case _ => MethodNotAllowed
-    }
 
     case req@Path("/api/user/login") =>
       val body : String = Body.string(req)
       logger.info("RequestBody: " ++ body)
       req match {
-      case POST(_) => req match {
-        case RequestContentType("application/json;charset=UTF-8") => req match {
-          case Accepts.Json(_) =>
-            Ok ~> JsonContent ~> {
-              val user: User = read[User](body)
-              val validatedUser = dbHandler.validateUser(user.username, user.password.get)
-              if (validatedUser.isDefined) {
-                val sessionId : String = NbrnoServer.sessionStore.addUser(validatedUser.get)
-                Ok ~> SetCookies(Cookie("SESSION_ID", sessionId, None, Some("/"), Some(oneYear)))
+        case POST(_) => req match {
+          case RequestContentType("application/json;charset=UTF-8") => req match {
+            case Accepts.Json(_) =>
+              Ok ~> JsonContent ~> {
+                val user: User = read[User](body)
+                val validatedUser = dbHandler.validateUser(user.username, user.password.get)
+                if (validatedUser.isDefined) {
+                  val sessionId : String = NbrnoServer.sessionStore.addUser(validatedUser.get)
+                  Ok ~> SetCookies(Cookie("SESSION_ID", sessionId, None, Some("/"), Some(oneYear)))
+                }
+                else BadRequest ~> ResponseString("Wrong username or password")
               }
-              else BadRequest ~> ResponseString("Wrong username or password")
-            }
-          case _ => NotAcceptable
+            case _ => NotAcceptable
+          }
+          case _ => UnsupportedMediaType
         }
-        case _ => UnsupportedMediaType
+        case _ => MethodNotAllowed
       }
-      case _ => MethodNotAllowed
-    }
 
     case req@Path("/api/user/login/cookie") =>
       val body : String = Body.string(req)
@@ -129,7 +130,7 @@ object UserPlan extends Plan {
             case Accepts.Json(_) =>
               Ok ~> JsonContent ~> {
                 val cookie = scala.util.parsing.json.JSON.parseFull(body)
-                 cookie match {
+                cookie match {
                   case Some(map : Map[String, String]) => {
                     val user = NbrnoServer.sessionStore.getUser(map.get("SESSION_ID").get)
                     user match {
@@ -161,6 +162,36 @@ object UserPlan extends Plan {
                 val sessionId = cookies("SESSION_ID")
                 if(sessionId.isDefined) NbrnoServer.sessionStore.removeUser(sessionId.get.value)
                 Ok ~> SetCookies(Cookie("SESSION_ID", "", None, Some("/")))
+              }
+            case _ => NotAcceptable
+          }
+          case _ => UnsupportedMediaType
+        }
+        case _ => MethodNotAllowed
+      }
+
+    case req@Path("/api/user/login/forgot") =>
+      val body : String = Body.string(req)
+      logger.info("RequestBody: " ++ body)
+      req match {
+        case POST(_) => req match {
+          case RequestContentType("application/json;charset=UTF-8") => req match {
+            case Accepts.Json(_) =>
+              Ok ~> JsonContent ~> {
+                val json = scala.util.parsing.json.JSON.parseFull(body)
+                json match {
+                  case Some(map : Map[String, String]) => {
+                    val email = map.get("email").get
+                    val passwordReset : Boolean = dbHandler.resetPassword(email, "password")
+                    passwordReset match {
+                      case true =>{
+                        Ok ~> ResponseString("")
+                      }
+                      case false => BadRequest ~> ResponseString("No user found")
+                    }
+                  }
+                  case _ => BadRequest ~> ResponseString("No SESSION_ID")
+                }
               }
             case _ => NotAcceptable
           }

@@ -60,9 +60,7 @@ class SessionStore(var map:immutable.HashMap[String, User], dbHandler : Database
   def getUser(token : String) : Option[User] = {
     map.get(token) match {
       case Some(user) => Option(user)
-      case None => {
-        dbHandler.retrieveSession(token)
-      }
+      case None => dbHandler.retrieveSession(token)
     }
   }
 

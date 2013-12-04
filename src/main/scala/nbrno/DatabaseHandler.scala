@@ -118,7 +118,7 @@ class DatabaseHandler(dataSource : DataSource) {
     }
   }
 
-  def validateUser(username : String, password : String) : Option[User] = {
+  def validateUser(username: String, password: String) : Option[User] = {
     Database.forDataSource(dataSource) withSession {
       val query = for{
         u <- Users if u.username === username
@@ -129,7 +129,7 @@ class DatabaseHandler(dataSource : DataSource) {
     }
   }
 
-  def vote(userId : Int, rapperId : Int, voteUp : Boolean) = {
+  def vote(userId: Int, rapperId: Int, voteUp: Boolean) = {
     Database.forDataSource(dataSource) withSession {
       val points : Int = if(voteUp) 1 else -1
       val query =  for{
@@ -151,14 +151,14 @@ class DatabaseHandler(dataSource : DataSource) {
     }
   }
 
-  def saveSession(sessionId : String, userId : Int){
+  def saveSession(sessionId: String, userId : Int){
     val now = new Timestamp(new Date().getTime)
     Database.forDataSource(dataSource) withSession {
       Sessions.forInsert insert(sessionId, userId, now)
     }
   }
 
-  def retrieveSession(sessionId : String) : Option[User] = {
+  def retrieveSession(sessionId: String) : Option[User] = {
     Database.forDataSource(dataSource) withSession {
       val query = for{
         s <- Sessions if s.sessionId === sessionId
@@ -173,13 +173,26 @@ class DatabaseHandler(dataSource : DataSource) {
     }
   }
 
-  def removeSession(sessionId : String){
+  def removeSession(sessionId: String){
     Database.forDataSource(dataSource) withSession {
       val query = for{
         s <- Sessions if s.sessionId === sessionId
       } yield s
       query.delete
     }
+  }
+
+  def resetPassword(email: String, newPassword: String): Boolean = {
+    Database.forDataSource(dataSource) withSession {
+      val q = for{
+        u <- Users if u.email === email
+      } yield (u.passhash)
+      if(q.list.size > 0) {
+        q.update(Some(SCryptUtil.scrypt(newPassword, 512, 8 ,8)))
+        true
+      }else false
+    }
+    //TODO throwing exceptions here instead?
   }
 
   private def updateRating(rating : Rating, points : Int){
