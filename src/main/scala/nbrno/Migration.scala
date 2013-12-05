@@ -8,10 +8,9 @@ import scala.slick.jdbc.meta.MTable
 
 object Migration extends App {
 
-  val dataSource = NbrnoServer.getDataSource
-  val dbHandler : DatabaseHandler = new DatabaseHandler(dataSource)
+  val dbHandler = ComponentRegistry.databaseHandler
 
-  implicit val session = Database.forDataSource(dataSource).createSession()
+  implicit val session = Database.forDataSource(ComponentRegistry.dataSource).createSession()
 
   if(MTable.getTables(dbHandler.Sessions.tableName).list.size > 0) dbHandler.Sessions.ddl.drop
   if(MTable.getTables(dbHandler.Ratings.tableName).list.size > 0) dbHandler.Ratings.ddl.drop

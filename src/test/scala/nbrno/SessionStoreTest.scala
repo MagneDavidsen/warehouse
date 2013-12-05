@@ -2,29 +2,9 @@ package nbrno
 
 import org.scalatest.FunSuite
 import nbrno.domain.User
-import scala.collection.immutable
-import org.scalamock.scalatest.MockFactory
-import javax.sql.DataSource
-import org.scalamock.MockFactoryBase
-import org.h2.jdbcx.JdbcDataSource
 import org.scalatest.matchers.ShouldMatchers
 
-
-class SessionStoreTest extends FunSuite with MockFactory with MockFactoryBase with ShouldMatchers{
-
-  val dataSource: DataSource = {
-    val ds = new JdbcDataSource
-    ds.setURL("jdbc:h2:mem:test1")
-    ds
-  }
-
-  object MockDbHandler extends DatabaseHandler(dataSource = dataSource){
-    override def saveSession(s: String, i : Int ) = mockFunction[String, Int]
-    override def retrieveSession(s: String) = None
-    override def removeSession(s: String) = {}
-  }
-
-  val sessionStore : SessionStore = new SessionStore(new immutable.HashMap[String, User], MockDbHandler )
+class SessionStoreTest extends FunSuite with ShouldMatchers with MockDBEnvironment{
 
   test("adding users works"){
     val token1 : String = sessionStore.addUser(User(Some(1), "user-1", None, None, None, None, None))
@@ -44,7 +24,6 @@ class SessionStoreTest extends FunSuite with MockFactory with MockFactoryBase wi
     val token5 : String = sessionStore.addUser(User(Some(5), "user-5", None, None, None, None, None))
     sessionStore.removeUser(token5)
 
-   sessionStore.getUser(token5) should be (None)
+    sessionStore.getUser(token5) should be (null) //because of no DB-implementation
   }
 }
-

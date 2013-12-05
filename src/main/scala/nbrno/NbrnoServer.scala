@@ -10,9 +10,49 @@ import javax.sql.DataSource
 import org.postgresql.ds.PGSimpleDataSource
 import unfiltered.Cookie
 
-object NbrnoServer extends App {
+object NbrnoServer extends App{
 
-  def getDataSource : DataSource = {
+  Http(Properties.envOrElse("PORT", "8081").toInt).resources(new URL(getClass().getResource("/www/"), "."))
+    .filter(RappersPlan).filter(UserPlan).filter(StatsPlan).run()
+}
+
+trait SessionStoreComponent{this: DatabaseHandlerComponent =>
+  val sessionStore: SessionStore
+
+  class SessionStore(var map:immutable.HashMap[String, User] = new immutable.HashMap[String, User]){
+
+    def addUser(user : User) : String = {
+      val token : String = UUID.randomUUID().toString
+      map += token -> user
+      databaseHandler.saveSession(token, user.id.get)
+      token
+    }
+
+    def getUser(token : String) : Option[User] = {
+      map.get(token) match {
+        case Some(user) => Option(user)
+        case None => databaseHandler.retrieveSession(token)
+      }
+    }
+
+    def getUserFromCookie(cookie : Option[Cookie]) : Option[User] = {
+      cookie match {
+        case Some(cookie) => getUser(cookie.value)
+        case None => None
+      }
+    }
+    def removeUser(token : String) = {
+      map-=(token)
+      databaseHandler.removeSession(token)
+    }
+
+    def size() : Int = map.size
+  }
+}
+
+object ComponentRegistry extends DatabaseHandlerComponent with DataSourceComponent with SessionStoreComponent{
+
+  val dataSource : DataSource = {
     val databaseUrl : Option[String] = Option(System.getenv("DATABASE_URL"))
     databaseUrl match{
       case Some(value) => {
@@ -38,42 +78,6 @@ object NbrnoServer extends App {
     }
   }
 
-  val dbHandler : DatabaseHandler = new DatabaseHandler(getDataSource)
-
-  //token is key, username is value
-  val sessionStore : SessionStore = new SessionStore(new immutable.HashMap[String, User], dbHandler)
-
-  Http(Properties.envOrElse("PORT", "8081").toInt).resources(new URL(getClass().getResource("/www/"), "."))
-    .filter(RappersPlan).filter(UserPlan).filter(StatsPlan).run()
-
-}
-
-class SessionStore(var map:immutable.HashMap[String, User], dbHandler : DatabaseHandler){
-
-  def addUser(user : User) : String = {
-    val token : String = UUID.randomUUID().toString
-    map += token -> user
-    dbHandler.saveSession(token, user.id.get)
-    token
-  }
-
-  def getUser(token : String) : Option[User] = {
-    map.get(token) match {
-      case Some(user) => Option(user)
-      case None => dbHandler.retrieveSession(token)
-    }
-  }
-
-  def getUserFromCookie(cookie : Option[Cookie]) : Option[User] = {
-    cookie match {
-      case Some(cookie) => getUser(cookie.value)
-      case None => None
-    }
-  }
-  def removeUser(token : String) = {
-    map-=(token)
-    dbHandler.removeSession(token)
-  }
-
-  def size() : Int = map.size
+  val databaseHandler = new DatabaseHandler
+  val sessionStore = new SessionStore
 }
