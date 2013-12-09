@@ -63,3 +63,5 @@ libraryDependencies += "io.gatling" % "gatling-app" % "2.0.0-SNAPSHOT" % "test"
 libraryDependencies += "io.gatling.highcharts" % "gatling-charts-highcharts" % "2.0.0-SNAPSHOT" % "test"
 
 libraryDependencies += "org.specs2" %% "specs2" % "2.3.4" % "test"
+
+libraryDependencies += "net.databinder.dispatch" %% "dispatch-core" % "0.11.0" % "test"
