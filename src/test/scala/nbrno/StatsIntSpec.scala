@@ -5,13 +5,22 @@ import dispatch._
 import org.scalatest.matchers.ShouldMatchers
 import scala.concurrent.ExecutionContext
 import ExecutionContext.Implicits.global
+import scala.slick.session.Database
 
-class StatsIntTest extends FunSpec with BeforeAndAfterAll with ShouldMatchers{
+class StatsIntSpec extends InMemDBEnvironment with DBTestData with FunSpec with BeforeAndAfterAll with ShouldMatchers{
 
-  val server = unfiltered.jetty.Http.anylocal.filter(StatsPlan)
+  val server = unfiltered.jetty.Http.anylocal.filter(statsPlan)
+  implicit val session = Database.forDataSource(dataSource).createSession()
 
   override def beforeAll(){
+    createAllTables
+    insertTestData
+
     server.start()
+  }
+
+  override def afterAll {
+    session.close()
   }
 
   describe("the stats api"){

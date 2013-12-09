@@ -4,12 +4,12 @@ import org.scalatest.FunSuite
 import nbrno.domain.User
 import org.scalatest.matchers.ShouldMatchers
 
-class SessionStoreTest extends FunSuite with ShouldMatchers with MockDBEnvironment{
+class SessionStoreSpec extends MockDBEnvironment with FunSuite with ShouldMatchers{
 
   test("adding users works"){
-    val token1 : String = sessionStore.addUser(User(Some(1), "user-1", None, None, None, None, None))
-    val token2 : String = sessionStore.addUser(User(Some(2), "user-2", None, None, None, None, None))
-    val token3 : String = sessionStore.addUser(User(Some(3), "user-3", None, None, None, None, None))
+    sessionStore.addUser(User(Some(1), "user-1", None, None, None, None, None))
+    sessionStore.addUser(User(Some(2), "user-2", None, None, None, None, None))
+    sessionStore.addUser(User(Some(3), "user-3", None, None, None, None, None))
 
     sessionStore.size() should be (3)
   }

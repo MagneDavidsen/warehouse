@@ -13,7 +13,7 @@ import unfiltered.Cookie
 object NbrnoServer extends App{
 
   Http(Properties.envOrElse("PORT", "8081").toInt).resources(new URL(getClass().getResource("/www/"), "."))
-    .filter(RappersPlan).filter(UserPlan).filter(StatsPlan).run()
+    .filter(ComponentRegistry.rappersPlan).filter(ComponentRegistry.userPlan).filter(ComponentRegistry.statsPlan).run()
 }
 
 trait SessionStoreComponent{this: DatabaseHandlerComponent =>
@@ -50,7 +50,7 @@ trait SessionStoreComponent{this: DatabaseHandlerComponent =>
   }
 }
 
-object ComponentRegistry extends DatabaseHandlerComponent with DataSourceComponent with SessionStoreComponent{
+object ComponentRegistry extends DatabaseHandlerComponent with DataSourceComponent with SessionStoreComponent with PlanComponent{
 
   val dataSource : DataSource = {
     val databaseUrl : Option[String] = Option(System.getenv("DATABASE_URL"))
@@ -80,4 +80,7 @@ object ComponentRegistry extends DatabaseHandlerComponent with DataSourceCompone
 
   val databaseHandler = new DatabaseHandler
   val sessionStore = new SessionStore
+  val statsPlan = new StatsPlan
+  val rappersPlan = new RappersPlan
+  val userPlan = new UserPlan
 }

@@ -3,33 +3,20 @@ package nbrno
 
 import scala.slick.driver.H2Driver.simple._
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfter, FunSuite}
-import scala.slick.session.Database
-import java.sql.Timestamp
-import nbrno.domain.{User, Rapper}
 import org.scalatest.matchers.ShouldMatchers
+import scala.slick.session.Database
 
-class DatabaseHandler$Test extends FunSuite with ShouldMatchers with BeforeAndAfter with BeforeAndAfterAll with InMemDBEnvironment{
-
-  val user1 = new User(Some(1), "user-1", Some("email-1"), Some("password-1"), Some("hash-1"), Some("ip-1"),
-    Some(Timestamp.valueOf("2013-06-20 13:37:00")))
-  val user2 = new User(Some(2), "user-2", Some("email-2"), Some("password-2"), Some("hash-2"), Some("ip-2"),
-    Some(Timestamp.valueOf("2013-06-20 13:37:00")))
-
-  val rapper1 = new Rapper(1, "rapper-1", Some(0), Timestamp.valueOf("2013-06-20 13:37:00"))
-  val rapper2 = new Rapper(2, "rapper-2", Some(0), Timestamp.valueOf("2013-06-20 13:37:00"))
-  val rapper3 = new Rapper(3, "rapper-3", Some(0), Timestamp.valueOf("2013-06-20 13:37:00"))
-
-  val sessionId: String = "session-id"
+class DatabaseHandlerSpec extends InMemDBEnvironment with DBTestData with FunSuite with ShouldMatchers with BeforeAndAfter with BeforeAndAfterAll{
 
   implicit val session = Database.forDataSource(dataSource).createSession()
 
   override def beforeAll {
-    //create all tables
-    (databaseHandler.Sessions.ddl ++ databaseHandler.Rappers.ddl ++ databaseHandler.Ratings.ddl ++ databaseHandler.Users.ddl).create
+    createAllTables
+    insertTestData
+  }
 
-    //populate rappers and users
-    databaseHandler.Rappers.insertAll(rapper1, rapper2, rapper3)
-    databaseHandler.Users.insertAll(user1, user2)
+  override def afterAll {
+    session.close()
   }
 
   after{
