@@ -8,6 +8,8 @@ scalaVersion :="2.10.3"
 
 version :="0.1"
 
+parallelExecution in Test := false
+
 resolvers += "coda" at "http://repo.codahale.com"
 
 resolvers += "sonatype-repo" at "http://oss.sonatype.org"
