@@ -21,6 +21,7 @@ class StatsIntSpec extends InMemDBEnvironment with DBTestData with FunSpec with 
 
   override def afterAll {
     session.close()
+    server.stop()
   }
 
   describe("the stats api"){
