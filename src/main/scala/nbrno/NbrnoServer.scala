@@ -9,10 +9,49 @@ import nbrno.domain.User
 import javax.sql.DataSource
 import org.postgresql.ds.PGSimpleDataSource
 import unfiltered.Cookie
+import org.eclipse.jetty.servlets.CrossOriginFilter
+import javax.servlet.{ServletContext, FilterConfig}
+import java.util
+
+
+class NbrnoCrossOriginFilter extends CrossOriginFilter {
+
+  override def init(filterConfig: FilterConfig) {
+    val allowedOriginsConfig: String =  "*"
+    val allowedMethodsConfig: String = "GET,POST,HEAD"
+    val allowedHeadersConfig = "X-Requested-With,Content-Type,Accept,Origin"
+    val preflightMaxAgeConfig: String = "1800"
+    val allowedCredentialsConfig: String =  "true"
+    val exposedHeadersConfig: String = ""
+    val chainPreflightConfig: String =  "false"
+
+    super.init(new FilterConfig {
+      def getFilterName: String = "cross-origin"
+
+      def getInitParameterNames: util.Enumeration[_] = null
+
+      def getInitParameter(name: String): String = {
+        name match {
+          case CrossOriginFilter.ALLOWED_ORIGINS_PARAM => allowedOriginsConfig
+          case CrossOriginFilter.ALLOWED_METHODS_PARAM => allowedMethodsConfig
+          case CrossOriginFilter.ALLOWED_HEADERS_PARAM => allowedHeadersConfig
+          case CrossOriginFilter.PREFLIGHT_MAX_AGE_PARAM => preflightMaxAgeConfig
+          case CrossOriginFilter.ALLOW_CREDENTIALS_PARAM => allowedCredentialsConfig
+          case CrossOriginFilter.EXPOSED_HEADERS_PARAM => exposedHeadersConfig
+          case CrossOriginFilter.CHAIN_PREFLIGHT_PARAM => chainPreflightConfig
+          case _ => null
+        }
+      }
+      def getServletContext: ServletContext = null
+    })
+  }
+}
 
 object NbrnoServer extends App{
 
-  Http(Properties.envOrElse("PORT", "8081").toInt).resources(new URL(getClass().getResource("/www/"), "."))
+  val crossOriginFilter: CrossOriginFilter = new NbrnoCrossOriginFilter()
+
+  Http(Properties.envOrElse("PORT", "8081").toInt).filter(crossOriginFilter).resources(new URL(getClass().getResource("/www/"), "."))
     .filter(ComponentRegistry.rappersPlan).filter(ComponentRegistry.userPlan).filter(ComponentRegistry.statsPlan).run()
 }
 

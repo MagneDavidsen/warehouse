@@ -67,3 +67,6 @@ libraryDependencies += "io.gatling.highcharts" % "gatling-charts-highcharts" % "
 libraryDependencies += "org.specs2" %% "specs2" % "2.3.4" % "test"
 
 libraryDependencies += "net.databinder.dispatch" %% "dispatch-core" % "0.11.0" % "test"
+
+libraryDependencies += "org.eclipse.jetty" % "jetty-servlets" % "7.6.9.v20130131"
+
