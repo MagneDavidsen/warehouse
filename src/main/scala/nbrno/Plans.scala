@@ -73,7 +73,7 @@ trait PlanComponent{this: DatabaseHandlerComponent with SessionStoreComponent =>
     implicit val formats = DefaultFormats
     val logger : Logger = LoggerFactory.getLogger("nbrno.UserPlan")
     def env: String = Properties.envOrElse("ENV", "dev")
-    def host: String = if (env.equals("prod")) ".herokuapp.com" else "localhost"
+    def host: String = if (env.equals("prod")) ".herokuapp.com" else ""
 
     val oneYear: Int = 31536000
 
