@@ -122,7 +122,7 @@ trait PlanComponent{this: DatabaseHandlerComponent with SessionStoreComponent =>
           case _ => MethodNotAllowed
         }
 
-      case req@Path("/api/user/login/cookie") =>
+      case req@Path("/api/user/cookie") =>
         val body : String = Body.string(req)
         logger.info("RequestBody: " ++ body)
         req match {
