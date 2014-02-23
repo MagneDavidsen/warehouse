@@ -9,6 +9,7 @@ import org.json4s.native.Serialization.{read, write}
 import unfiltered.response.ResponseString
 import org.slf4j.{LoggerFactory, Logger}
 import unfiltered.Cookie
+import scala.util.Properties
 
 trait PlanComponent{this: DatabaseHandlerComponent with SessionStoreComponent =>
   val statsPlan: StatsPlan
@@ -71,7 +72,9 @@ trait PlanComponent{this: DatabaseHandlerComponent with SessionStoreComponent =>
   class UserPlan extends Plan {
     implicit val formats = DefaultFormats
     val logger : Logger = LoggerFactory.getLogger("nbrno.UserPlan")
-    def cookieDomain: String = "." + NbrnoServer.server.host
+    def env: String = Properties.envOrElse("ENV", "dev")
+    def host: String = if (env.equals("prod")) ".herokuapp.com" else "localhost"
+
     val oneYear: Int = 31536000
 
     def intent = {
@@ -88,7 +91,7 @@ trait PlanComponent{this: DatabaseHandlerComponent with SessionStoreComponent =>
                   if (databaseHandler.availableUsername(user.username)) {
                     val newUser : User = databaseHandler.createUser(user, req.remoteAddr)
                     val sessionId : String = sessionStore.addUser(newUser)
-                    Ok ~> SetCookies(Cookie("SESSION_ID", sessionId, Some(cookieDomain), Some("/"), Some(oneYear)))
+                    Ok ~> SetCookies(Cookie("SESSION_ID", sessionId, Some(host), Some("/"), Some(oneYear)))
                   }
                   else BadRequest ~> ResponseString("Username not available")
                 }
@@ -112,7 +115,7 @@ trait PlanComponent{this: DatabaseHandlerComponent with SessionStoreComponent =>
                   if (validatedUser.isDefined) {
                     val sessionId : String = sessionStore.addUser(validatedUser.get)
 
-                    Ok ~> SetCookies(Cookie("SESSION_ID", sessionId, Some(cookieDomain), Some("/"), Some(oneYear)))
+                    Ok ~> SetCookies(Cookie("SESSION_ID", sessionId, Some(host), Some("/"), Some(oneYear)))
                   }
                   else BadRequest ~> ResponseString("Wrong username or password")
                 }
