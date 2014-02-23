@@ -7,6 +7,6 @@ deploy:
   provider: heroku
   api_key:
     secure: R41ok8VmNdNlOgnLq6Or409kY+InindWAdJBuiRTW94rpkBRPAIMr14D04iEvVqCXi0wzSO7iFr/WSjCA0MseuFTt8WUPBMp/U0P+XddDAyX5UXc/BN1SLJg7efcPVPn/QksHbvTSiUcU+ZJQSjN7HrcMZmj1Mh93xwKnbNRw4s=
-  app: nbrno
+  app: nbrno-backend
   on:
-    repo: MagneDavidsen/nbrno
+    repo: MagneDavidsen/nbrno-backend
