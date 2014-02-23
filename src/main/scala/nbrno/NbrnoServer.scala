@@ -51,8 +51,11 @@ object NbrnoServer extends App{
 
   val crossOriginFilter: CrossOriginFilter = new NbrnoCrossOriginFilter()
 
-  Http(Properties.envOrElse("PORT", "8081").toInt).filter(crossOriginFilter).resources(new URL(getClass().getResource("/www/"), "."))
-    .filter(ComponentRegistry.rappersPlan).filter(ComponentRegistry.userPlan).filter(ComponentRegistry.statsPlan).run()
+  val server = Http(Properties.envOrElse("PORT", "8081").toInt).filter(crossOriginFilter).resources(new URL(getClass().getResource("/www/"), "."))
+    .filter(ComponentRegistry.rappersPlan).filter(ComponentRegistry.userPlan).filter(ComponentRegistry.statsPlan)
+
+  server.run()
+
 }
 
 trait SessionStoreComponent{this: DatabaseHandlerComponent =>
