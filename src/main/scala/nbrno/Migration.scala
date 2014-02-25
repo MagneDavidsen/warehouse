@@ -19,11 +19,10 @@ object Migration extends App {
 
   (dbHandler.Sessions.ddl ++ dbHandler.Rappers.ddl ++ dbHandler.Ratings.ddl ++ dbHandler.Users.ddl).create
 
-  val rsp = new Rapper(1, "RSP", Some(0), Timestamp.valueOf("2013-10-13 13:37:00"))
-  val chirag = new Rapper(2, "Chirag", Some(0), Timestamp.valueOf("2013-10-13 13:37:00"))
-  val lars = new Rapper(3, "Lars Vaular", Some(0), Timestamp.valueOf("2013-10-13 13:37:00"))
+  val rapperNames = Array("RSP", "Chirag", "Lars Vaular", "Store P", "Klish", "Vinni", "Mae", "Jørg-1", "Thorstein Hyl", "Pumba")
+  val rappers: Array[Rapper] = rapperNames.zipWithIndex.map{ case (name, index) => Rapper(index, name, Some(0), new Timestamp(System.currentTimeMillis))}
 
-  dbHandler.Rappers.insertAll(rsp, chirag, lars)
+  rappers.foreach{rapper: Rapper => dbHandler.Rappers.insert(rapper)}
 
   session.close()
 }
