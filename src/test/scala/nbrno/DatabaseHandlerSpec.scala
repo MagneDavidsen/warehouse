@@ -72,6 +72,13 @@ class DatabaseHandlerSpec extends InMemDBEnvironment with DBTestData with FunSui
     assert(databaseHandler.getVotes(user1.username).length == 1)
   }
 
+  test("getVotes returns correct vote when voting up then down"){
+    databaseHandler.vote(user1.id.get,rapper1.id,true)
+    databaseHandler.vote(user1.id.get,rapper1.id,false)
+
+    assert(databaseHandler.getVotes(user1.username).head.rating == -1)
+  }
+
   test("getVotes only returns this users vote"){
     databaseHandler.vote(user1.id.get,rapper1.id,true)
     databaseHandler.vote(user1.id.get,rapper2.id,false)

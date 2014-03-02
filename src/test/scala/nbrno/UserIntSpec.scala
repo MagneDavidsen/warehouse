@@ -11,8 +11,6 @@ import org.json4s.native.Serialization.write
 
 class UserIntSpec extends InMemDBEnvironment with DBTestData with FunSpec with BeforeAndAfterAll with ShouldMatchers {
 
-  case class JsonUser(val username: String, val email: String, val password: String)
-
   val server = unfiltered.jetty.Http.anylocal.filter(userPlan)
   lazy val myHost = host("localhost", server.port)
   implicit val session = Database.forDataSource(dataSource).createSession()
@@ -32,7 +30,7 @@ class UserIntSpec extends InMemDBEnvironment with DBTestData with FunSpec with B
     it("should save the user to the database"){
 
       val json = write(JsonUser("user-1", "email-1", "pass-1"))
-      val req = setJsonHeaders(myHost / "api" / "user" / "signup").setBody(json).POST
+      val req = TestHelper.setJsonHeaders(myHost / "api" / "user" / "signup").setBody(json).POST
 
       println(req.toString)
 
@@ -43,8 +41,41 @@ class UserIntSpec extends InMemDBEnvironment with DBTestData with FunSpec with B
     }
   }
 
+  describe("the login service"){
+    it("should accept a user that has signed up"){
+
+      val json = write(JsonUser("user-1", "", "pass-1"))
+      val req = TestHelper.setJsonHeaders(myHost / "api" / "user" / "login").setBody(json).POST
+
+      println(req.toString)
+
+      val response = Http(req)
+
+      response().getStatusCode should be (200)
+    }
+  }
+
+  describe("the login service"){
+    it("should not accept a user with a wrong password"){
+
+      val json = write(JsonUser("user-1", "", "pass-2"))
+      val req = TestHelper.setJsonHeaders(myHost / "api" / "user" / "login").setBody(json).POST
+
+      println(req.toString)
+
+      val response = Http(req)
+
+      response().getStatusCode should be (400)
+    }
+  }
+
+
+}
+object TestHelper {
   def setJsonHeaders(endpoint: Req): Req = {
     endpoint.setHeader("Content-Type", "application/json;charset=UTF-8")
       .setHeader("Accept", "application/json")
   }
 }
+
+case class JsonUser(val username: String, val email: String, val password: String)

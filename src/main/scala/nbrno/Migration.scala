@@ -19,7 +19,7 @@ object Migration extends App {
 
   (dbHandler.Sessions.ddl ++ dbHandler.Rappers.ddl ++ dbHandler.Ratings.ddl ++ dbHandler.Users.ddl).create
 
-  val rapperNames = Array("RSP", "Chirag", "Lars Vaular", "Store P", "Klish", "Vinni", "Mae", "Jørg-1", "Thorstein Hyl", "Pumba")
+  val rapperNames = Array("RSP", "Chirag", "Lars Vaular", "Store P", "Klish", "Erik de Torres", "Mae", "Jørg-1", "Mats Dawg", "Pumba")
   val rappers: Array[Rapper] = rapperNames.zipWithIndex.map{ case (name, index) => Rapper(index, name, Some(0), new Timestamp(System.currentTimeMillis))}
 
   rappers.foreach{rapper: Rapper => dbHandler.Rappers.insert(rapper)}
