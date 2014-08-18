@@ -22,7 +22,7 @@ class VoteIntSpec extends InMemDBEnvironment with DBTestData with FunSpec with B
   def userSignUp() {
     val json = write(JsonUser("user-1", "email-1", "pass-1"))
     val req = TestHelper.setJsonHeaders(myHost / "api" / "user" / "signup").setBody(json).POST
-  
+
     println(req.toString)
 
     val validSignup = Http(req OK as.String)
