@@ -1,20 +1,18 @@
-package nbrno
+package warehouse
 
-import unfiltered.jetty.Http
-import scala.util.Properties
 import java.net.{URI, URL}
-import scala.collection.immutable
-import java.util.UUID
-import nbrno.domain.User
-import javax.sql.DataSource
-import org.postgresql.ds.PGSimpleDataSource
-import unfiltered.Cookie
-import org.eclipse.jetty.servlets.CrossOriginFilter
-import javax.servlet.{ServletContext, FilterConfig}
 import java.util
+import javax.servlet.{FilterConfig, ServletContext}
+import javax.sql.DataSource
+
+import org.eclipse.jetty.servlets.CrossOriginFilter
+import org.postgresql.ds.PGSimpleDataSource
+import unfiltered.jetty.Http
+
+import scala.util.Properties
 
 
-class NbrnoCrossOriginFilter extends CrossOriginFilter {
+class WarehouseCrossOriginFilter extends CrossOriginFilter {
 
   override def init(filterConfig: FilterConfig) {
     val allowedOriginsConfig: String =  "*"
@@ -47,52 +45,18 @@ class NbrnoCrossOriginFilter extends CrossOriginFilter {
   }
 }
 
-object NbrnoServer extends App{
+object WarehouseServer extends App{
 
-  val crossOriginFilter: CrossOriginFilter = new NbrnoCrossOriginFilter()
+  val crossOriginFilter: CrossOriginFilter = new WarehouseCrossOriginFilter()
 
   val server = Http(Properties.envOrElse("PORT", "8081").toInt).filter(crossOriginFilter).resources(new URL(getClass().getResource("/www/"), "."))
-    .filter(ComponentRegistry.rappersPlan).filter(ComponentRegistry.userPlan).filter(ComponentRegistry.statsPlan)
+    .filter(ComponentRegistry.itemsPlan)
 
   server.run()
 
 }
 
-trait SessionStoreComponent{this: DatabaseHandlerComponent =>
-  val sessionStore: SessionStore
-
-  class SessionStore(var map:immutable.HashMap[String, User] = new immutable.HashMap[String, User]){
-
-    def addUser(user : User) : String = {
-      val token : String = UUID.randomUUID().toString
-      map += token -> user
-      databaseHandler.saveSession(token, user.id.get)
-      token
-    }
-
-    def getUser(token : String) : Option[User] = {
-      map.get(token) match {
-        case Some(user) => Option(user)
-        case None => databaseHandler.retrieveSession(token)
-      }
-    }
-
-    def getUserFromCookie(cookie : Option[Cookie]) : Option[User] = {
-      cookie match {
-        case Some(cookie) => getUser(cookie.value)
-        case None => None
-      }
-    }
-    def removeUser(token : String) = {
-      map-=(token)
-      databaseHandler.removeSession(token)
-    }
-
-    def size() : Int = map.size
-  }
-}
-
-object ComponentRegistry extends DatabaseHandlerComponent with DataSourceComponent with SessionStoreComponent with PlanComponent{
+object ComponentRegistry extends DatabaseHandlerComponent with DataSourceComponent with PlanComponent{
 
   val dataSource : DataSource = {
     val databaseUrl : Option[String] = Option(System.getenv("DATABASE_URL"))
@@ -121,8 +85,5 @@ object ComponentRegistry extends DatabaseHandlerComponent with DataSourceCompone
   }
 
   val databaseHandler = new DatabaseHandler
-  val sessionStore = new SessionStore
-  val statsPlan = new StatsPlan
-  val rappersPlan = new RappersPlan
-  val userPlan = new UserPlan
+  val itemsPlan = new ItemsPlan
 }

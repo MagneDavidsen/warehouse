@@ -1,2 +1,2 @@
-web: target/start nbrno.NbrnoServer
-migration: target/start nbrno.Migration
+web: target/start warehouse.WarehouseServer
+migration: target/start warehouse.Migration
