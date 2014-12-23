@@ -7,6 +7,9 @@ project/plugins/target
 .gradle
 .idea
 .idea_modules
+*.iml
+*.ipr
+*.iws
 
 
 # Compiled source #
@@ -17,6 +20,8 @@ project/plugins/target
 *.exe
 *.o
 *.so
+build
+
 
 # Packages #
 ############

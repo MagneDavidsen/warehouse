@@ -2,11 +2,11 @@
 package nbrno
 
 import scala.slick.driver.H2Driver.simple._
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfter, FunSuite}
+import org.scalatest.{FunSuiteLike, BeforeAndAfterAll, BeforeAndAfter}
 import org.scalatest.matchers.ShouldMatchers
 import scala.slick.session.Database
 
-class DatabaseHandlerSpec extends InMemDBEnvironment with DBTestData with FunSuite with ShouldMatchers with BeforeAndAfter with BeforeAndAfterAll{
+class DatabaseHandlerSpec extends InMemDBEnvironment with DBTestData with FunSuiteLike with ShouldMatchers with BeforeAndAfter with BeforeAndAfterAll{
 
   implicit val session = Database.forDataSource(dataSource).createSession()
 

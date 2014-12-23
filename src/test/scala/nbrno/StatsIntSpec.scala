@@ -1,13 +1,13 @@
 package nbrno
 
-import org.scalatest.{BeforeAndAfterAll, FunSpec}
+import org.scalatest.{FunSpecLike, BeforeAndAfterAll, FunSpec}
 import dispatch._
 import org.scalatest.matchers.ShouldMatchers
 import scala.concurrent.ExecutionContext
 import ExecutionContext.Implicits.global
 import scala.slick.session.Database
 
-class StatsIntSpec extends InMemDBEnvironment with DBTestData with FunSpec with BeforeAndAfterAll with ShouldMatchers{
+class StatsIntSpec extends InMemDBEnvironment with DBTestData with FunSpecLike with BeforeAndAfterAll with ShouldMatchers{
 
   val server = unfiltered.jetty.Http.anylocal.filter(statsPlan)
   implicit val session = Database.forDataSource(dataSource).createSession()

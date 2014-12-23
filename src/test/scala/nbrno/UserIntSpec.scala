@@ -1,7 +1,7 @@
 package nbrno
 
 import scala.slick.session.Database
-import org.scalatest.{BeforeAndAfterAll, FunSpec}
+import org.scalatest.{FunSpecLike, BeforeAndAfterAll}
 import org.scalatest.matchers.ShouldMatchers
 import dispatch._
 import scala.concurrent.ExecutionContext
@@ -9,7 +9,7 @@ import ExecutionContext.Implicits.global
 import org.json4s.DefaultFormats
 import org.json4s.native.Serialization.write
 
-class UserIntSpec extends InMemDBEnvironment with DBTestData with FunSpec with BeforeAndAfterAll with ShouldMatchers {
+class UserIntSpec extends InMemDBEnvironment with DBTestData with FunSpecLike with BeforeAndAfterAll with ShouldMatchers {
 
   val server = unfiltered.jetty.Http.anylocal.filter(userPlan)
   lazy val myHost = host("localhost", server.port)

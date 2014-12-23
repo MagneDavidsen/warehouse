@@ -1,10 +1,10 @@
 package nbrno
 
-import org.scalatest.FunSuite
+import org.scalatest.{FunSuiteLike, FunSuite}
 import nbrno.domain.User
 import org.scalatest.matchers.ShouldMatchers
 
-class SessionStoreSpec extends MockDBEnvironment with FunSuite with ShouldMatchers{
+class SessionStoreSpec extends MockDBEnvironment with FunSuiteLike with ShouldMatchers{
 
   test("adding users works"){
     sessionStore.addUser(User(Some(1), "user-1", None, None, None, None, None))

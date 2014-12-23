@@ -1,3 +1,49 @@
+apply plugin: 'scala'
+apply plugin: 'idea'
+
+repositories {
+    mavenCentral()
+}
+
+def buildScalaVersion = "2.10.4"
+def mainVersionScala = "2.10"
+
+dependencies {
+    compile "org.scala-lang:scala-library:$buildScalaVersion"
+    compile "com.typesafe.slick:slick_$mainVersionScala:1.0.1"
+    compile "postgresql:postgresql:9.1-901.jdbc4"
+
+    compile "net.databinder:unfiltered-filter_$mainVersionScala:0.6.8"
+    compile "net.databinder:unfiltered-json4s_$mainVersionScala:0.6.8"
+    compile "net.databinder:unfiltered-jetty_$mainVersionScala:0.6.8"
+
+    compile "org.eclipse.jetty:jetty-servlets:7.6.9.v20130131"
+    compile "com.lambdaworks:scrypt:1.4.0"
+
+    compile "org.json4s:json4s-native_$mainVersionScala:3.2.4"
+    compile "org.slf4j:slf4j-api:1.7.5"
+
+    testCompile "org.scalatest:scalatest_$mainVersionScala:1.9.1"
+    testCompile "junit:junit:4.10"
+    testCompile "org.scalamock:scalamock-scalatest-support_$mainVersionScala:3.0.1"
+
+    testCompile "com.h2database:h2:1.3.173"
+
+    // Gatling
+//    testCompile "io.gatling:gatling-core:2.0.0"
+//    testCompile "io.gatling:gatling-http:2.0.0"
+//    testCompile "io.gatling:gatling-app:2.0.0"
+//    testCompile "io.gatling.highcharts:gatling-charts-highcharts:2.0.0"
+
+
+    testCompile "org.specs2:specs2_$mainVersionScala:2.3.4"
+
+    testCompile "com.ning:async-http-client:1.8.14"
+    testCompile "net.databinder.dispatch:dispatch-core_$mainVersionScala:0.11.2"
+
+    testCompile "org.scalatest:scalatest_$mainVersionScala:2.1.7"
+}
+
 task wrapper(type: Wrapper) {
     gradleVersion = '2.2.1'
 }
