@@ -14,6 +14,5 @@ object Migration extends App {
 
   (dbHandler.Items.ddl).create
 
-
   session.close()
 }

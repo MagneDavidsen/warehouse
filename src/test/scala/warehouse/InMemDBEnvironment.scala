@@ -10,8 +10,8 @@ import java.sql.{Blob, Timestamp}
 
 trait DBTestData extends Mockito {this: InMemDBEnvironment =>
 
-  val item1 = new Item(Some(1), "item-1", 100, Some("String"), null, Some(Timestamp.valueOf("2013-06-20 13:37:00")))
-  val item2 = new Item(Some(2), "item-2", 200, Some("String"), null, Some(Timestamp.valueOf("2013-06-20 13:37:00")))
+  val item1 = new Item(Some(1), "item-1", 100, Some("String"), "OLA", Some(Timestamp.valueOf("2013-06-20 13:37:00")))
+  val item2 = new Item(Some(2), "item-2", 200, Some("String"), "OLA", Some(Timestamp.valueOf("2013-06-20 13:37:00")))
 
 
   def createAllTables(implicit session: Session) = {

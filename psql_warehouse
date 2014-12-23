@@ -1,0 +1,2 @@
+#!/bin/sh
+psql -h 192.168.59.104 -p 49533 -d warehouse -U warehouse --password

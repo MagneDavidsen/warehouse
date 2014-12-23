@@ -1,6 +1,62 @@
+<!DOCTYPE HTML>
 <html>
 <body>
-<input type="file" capture="camera" accept="image/*" id="cameraInput" name="cameraInput">
+
+<script src="lib/qwest.min.js"></script>
+
+<script>
+    var b64img;
+
+    function uploadPicture(){
+        var preview = document.getElementById('preview');
+        var canvas = document.createElement("canvas");
+        var selected_file = document.getElementById('cameraInput').files[0];
+
+        console.log(selected_file);
+        var img = document.createElement("img");
+        img.src = window.URL.createObjectURL(selected_file);
+        preview.appendChild(img);
+
+        console.log(window.URL.createObjectURL(selected_file));
+
+        var reader = new FileReader();
+
+        reader.onload = function(evt) {
+            b64img = window.btoa(evt.target.result);
+        };
+
+        reader.readAsBinaryString(selected_file);
+    }
+
+    function sendToServer() {
+        qwest.post('api/items', {
+            reference: 'test',
+            quantity: 500,
+            packages: "packages test",
+            picture: b64img
+        }, {dataType: "json", headers: {"Accept":"application/json"}})
+                .then(function (response) {
+                    // Make some useful actions
+                })
+                .catch(function (message) {
+                    // Print the error message
+                });
+    }
+
+
+</script>
+
+
+<form method='post' action='/api/items'>
+    <input type='text' name='rapperName'/>
+    <input type="file" capture="camera" accept="image/*" id="cameraInput" name="cameraInput" onchange="uploadPicture()">
+    <input type='button'  onclick="sendToServer()"/>
+</form>
+
+
+<div id="preview"></div>
+
+
 
 </body>
 </html>

@@ -23,7 +23,7 @@ trait PlanComponent{this: DatabaseHandlerComponent =>
         logger.info("RequestBody: " ++ body)
         req match {
           case POST(_) => req match {
-            case RequestContentType("application/json;charset=UTF-8") => req match {
+            case RequestContentType("application/json") => req match {
               case Accepts.Json(_) =>
                 Ok ~> JsonContent ~> {
                   val item: Item = read[Item](body)

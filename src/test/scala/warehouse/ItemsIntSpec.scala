@@ -1,6 +1,5 @@
 package warehouse
 
-
 import scala.slick.session.Database
 import org.scalatest.{FunSpecLike, BeforeAndAfterAll}
 import org.scalatest.matchers.ShouldMatchers
@@ -30,7 +29,7 @@ class ItemsIntSpec extends InMemDBEnvironment with DBTestData with FunSpecLike w
   describe("create item service"){
     it("should accept return 201 when correct payload is sent"){
 
-      val json = write(JsonItem("reference", 100, "packages", None))
+      val json = write(JsonItem("reference", 100, "packages", "test"))
       val req = TestHelper.setJsonHeaders(myHost / "api" / "items").setBody(json).POST
 
       println(req.toString)
@@ -50,4 +49,4 @@ object TestHelper {
   }
 }
 
-case class JsonItem(val reference: String, val quantity: Int, val packages: String, picture: Option[Array[Byte]])
+case class JsonItem(val reference: String, val quantity: Int, val packages: String, picture: String)

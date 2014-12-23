@@ -74,11 +74,11 @@ object ComponentRegistry extends DatabaseHandlerComponent with DataSourceCompone
       case None => {
         //fallback for dev
         val ds = new PGSimpleDataSource
-        ds.setDatabaseName("nbrno")
-        ds.setUser(Properties.envOrElse("DB_USER", "clocking"))
-        ds.setPassword(Properties.envOrElse("DB_PASSWORD", "clocking"))
-        ds.setServerName("localhost")
-        ds.setPortNumber(5432)
+        ds.setDatabaseName("warehouse")
+        ds.setUser(Properties.envOrElse("DB_USER", "warehouse"))
+        ds.setPassword(Properties.envOrElse("DB_PASSWORD", "warehouse"))
+        ds.setServerName("192.168.59.104")
+        ds.setPortNumber(49533)
         ds
       }
     }

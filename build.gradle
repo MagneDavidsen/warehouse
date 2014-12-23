@@ -22,6 +22,7 @@ dependencies {
 
     compile "org.json4s:json4s-native_$mainVersionScala:3.2.4"
     compile "org.slf4j:slf4j-api:1.7.5"
+    compile "ch.qos.logback:logback-classic:1.1.2"
 
     testCompile "org.scalatest:scalatest_$mainVersionScala:1.9.1"
     testCompile "junit:junit:4.10"

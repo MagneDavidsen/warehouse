@@ -1,6 +1,6 @@
 package warehouse
 
-import java.sql.{Blob, Timestamp}
+import java.sql.Timestamp
 import java.util.Date
 import javax.sql.DataSource
 
@@ -21,7 +21,7 @@ trait DatabaseHandlerComponent{this: DataSourceComponent =>
   class DatabaseHandler {
     object ItemObject {
       def fromRow(id: Option[Int], reference: String, quantity: Int, packages: Option[String],
-                  picture: Option[Array[Byte]], createdAt: Option[Timestamp]): Item = Item(id, reference, quantity, packages, picture, createdAt)
+                  picture: String, createdAt: Option[Timestamp]): Item = Item(id, reference, quantity, packages, picture, createdAt)
 
       def toRow(i: Item) = Some(i.id, i.reference, i.quantity, i.packages, i.picture, i.createdAt)
     }
@@ -31,7 +31,7 @@ trait DatabaseHandlerComponent{this: DataSourceComponent =>
       def reference = column[String]("reference")
       def quantity = column[Int]("quantity")
       def packages = column[Option[String]]("packages")
-      def picture = column[Option[Array[Byte]]]("picture")
+      def picture = column[String]("picture", O.DBType("TEXT"))
       def createdAt = column[Option[Timestamp]]("created_at")
 
       def * = id ~ reference ~ quantity ~ packages ~ picture ~ createdAt <>(ItemObject.fromRow _, ItemObject.toRow _)
