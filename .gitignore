@@ -4,6 +4,7 @@ target
 project/boot
 project/target
 project/plugins/target
+.gradle
 .idea
 .idea_modules
 
@@ -25,7 +26,6 @@ project/plugins/target
 *.dmg
 *.gz
 *.iso
-*.jar
 *.rar
 *.tar
 *.zip
