@@ -9,6 +9,8 @@ repositories {
 def buildScalaVersion = "2.10.4"
 def mainVersionScala = "2.10"
 
+
+
 mainClassName = "warehouse.WarehouseServer"
 
 dependencies {
