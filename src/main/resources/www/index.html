@@ -36,10 +36,10 @@
             picture: b64img
         }, {dataType: "json", headers: {"Accept":"application/json"}})
                 .then(function (response) {
-                    // Make some useful actions
+                    console.log("done");
                 })
                 .catch(function (message) {
-                    // Print the error message
+                    console.log(message);
                 });
     }
 
@@ -47,7 +47,7 @@
 </script>
 
 
-<form method='post' action='/api/items'>
+<form>
     <input type='text' name='rapperName'/>
     <input type="file" capture="camera" accept="image/*" id="cameraInput" name="cameraInput" onchange="uploadPicture()">
     <input type='button'  onclick="sendToServer()"/>
