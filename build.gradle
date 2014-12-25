@@ -1,5 +1,6 @@
 apply plugin: 'scala'
 apply plugin: 'idea'
+apply plugin:'application'
 
 repositories {
     mavenCentral()
@@ -7,6 +8,8 @@ repositories {
 
 def buildScalaVersion = "2.10.4"
 def mainVersionScala = "2.10"
+
+mainClassName = "warehouse.WarehouseServer"
 
 dependencies {
     compile "org.scala-lang:scala-library:$buildScalaVersion"
@@ -50,11 +53,10 @@ task wrapper(type: Wrapper) {
 }
 
 task stage {
-    compileScala
+    installApp
 }
 
-task run(type: JavaExec, dependsOn: classes) {
-    main = 'warehouse/WarehouseServer'
-    classpath sourceSets.main.runtimeClasspath
-    classpath configurations.runtime
+task migration(type: JavaExec ) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'warehouse.Migration'
 }
