@@ -1,3 +1,14 @@
+apply plugin: 'gradle-one-jar'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.github.rholder:gradle-one-jar:1.0.4'
+    }
+}
+
 apply plugin: 'scala'
 apply plugin: 'idea'
 apply plugin:'application'
@@ -54,11 +65,21 @@ task wrapper(type: Wrapper) {
     gradleVersion = '2.2.1'
 }
 
+task warehouseJar(type: OneJar) {
+    mainClass = 'warehouse.WarehouseServer'
+}
+
+task migrationJar(type: OneJar) {
+    mainClass = 'warehouse.Migration'
+}
+
 task stage {
-    installApp
+    warehouseJar
+    migrationJar
 }
 
 task migration(type: JavaExec ) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'warehouse.Migration'
 }
+
