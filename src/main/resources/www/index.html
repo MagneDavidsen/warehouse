@@ -6,9 +6,10 @@
 
 <script>
     var b64img;
+    var preview = document.getElementById('preview');
 
     function uploadPicture(){
-        var preview = document.getElementById('preview');
+
         var canvas = document.createElement("canvas");
         var selected_file = document.getElementById('cameraInput').files[0];
 
@@ -36,7 +37,9 @@
             picture: b64img
         }, {timeout: 20000, dataType: "json", headers: {"Accept":"application/json"}})
                 .then(function (response) {
-                    console.log("done");
+                    while (preview.firstChild) {
+                        preview.removeChild(preview.firstChild);
+                    }
                 })
                 .catch(function (message) {
                     console.log(message);
@@ -50,7 +53,7 @@
 <form>
     <input type='text' name='rapperName'/>
     <input type="file" capture="camera" accept="image/*" id="cameraInput" name="cameraInput" onchange="uploadPicture()">
-    <input type='button'  onclick="sendToServer()"/>
+    <input type='button' value="Last opp"  onclick="sendToServer()"/>
 </form>
 
 
