@@ -6,10 +6,11 @@
 
 <script>
     var b64img;
-    var preview = document.getElementById('preview');
+
 
     function uploadPicture(){
 
+        var preview = document.getElementById('preview');
         var canvas = document.createElement("canvas");
         var selected_file = document.getElementById('cameraInput').files[0];
 
@@ -37,6 +38,7 @@
             picture: b64img
         }, {timeout: 20000, dataType: "json", headers: {"Accept":"application/json"}})
                 .then(function (response) {
+                    var preview = document.getElementById('preview');
                     while (preview.firstChild) {
                         preview.removeChild(preview.firstChild);
                     }
