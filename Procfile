@@ -1,1 +1,1 @@
-web: ./gradlew run
+web: ./build/install/warehouseApp/bin/warehouseApp

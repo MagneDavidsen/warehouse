@@ -1,6 +1,6 @@
 apply plugin: 'scala'
 apply plugin: 'idea'
-apply plugin:'application'
+apply plugin: 'application'
 
 repositories {
     mavenCentral()
@@ -9,6 +9,7 @@ repositories {
 def buildScalaVersion = "2.10.4"
 def mainVersionScala = "2.10"
 
+applicationName = "warehouseApp"
 mainClassName = "warehouse.WarehouseServer"
 
 dependencies {
@@ -52,3 +53,4 @@ task wrapper(type: Wrapper) {
     gradleVersion = '2.2.1'
 }
 
+task stage(dependsOn: ['clean', 'installApp'])
