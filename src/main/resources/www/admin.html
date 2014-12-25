@@ -1,0 +1,67 @@
+<!DOCTYPE HTML>
+<html>
+<body>
+
+<script src="lib/qwest.min.js"></script>
+
+<script>
+    var b64img;
+
+    var data;
+
+    function uploadPicture(){
+        var preview = document.getElementById('preview');
+        var canvas = document.createElement("canvas");
+        var selected_file = document.getElementById('cameraInput').files[0];
+
+        console.log(selected_file);
+        var img = document.createElement("img");
+        img.src = window.URL.createObjectURL(selected_file);
+        preview.appendChild(img);
+
+        console.log(window.URL.createObjectURL(selected_file));
+
+        var reader = new FileReader();
+
+        reader.onload = function(evt) {
+            b64img = window.btoa(evt.target.result);
+        };
+
+        reader.readAsBinaryString(selected_file);
+    }
+
+    function getFromServer() {
+        qwest.get('api/items', '', {headers: {"Accept":"application/json"}})
+                .then(function (response) {
+
+                    var data = JSON.parse(response);
+                    var preview = document.getElementById('preview');
+
+
+                    data.forEach(function(item) {
+                        var img = document.createElement("img");
+                        img.src = "data:image/png;base64," + item.picture;
+                        preview.appendChild(img);
+                    });
+
+                })
+                .catch(function (message) {
+                    // Print the error message
+                });
+    }
+
+
+</script>
+
+
+<form >
+    <input type='button'  onclick="getFromServer()"/>
+</form>
+
+
+<div id="preview"></div>
+
+
+
+</body>
+</html>

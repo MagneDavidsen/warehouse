@@ -44,7 +44,7 @@ class ItemsIntSpec extends InMemDBEnvironment with DBTestData with FunSpecLike w
 }
 object TestHelper {
   def setJsonHeaders(endpoint: Req): Req = {
-    endpoint.setHeader("Content-Type", "application/json;charset=UTF-8")
+    endpoint.setHeader("Content-Type", "application/json")
       .setHeader("Accept", "application/json")
   }
 }

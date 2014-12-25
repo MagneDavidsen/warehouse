@@ -48,6 +48,15 @@ trait DatabaseHandlerComponent{this: DataSourceComponent =>
       }
     }
 
+    def getItems(): List[Item] = {
+      Database.forDataSource(dataSource) withSession {
+        val query = for {
+          i <- Items
+        } yield i
+        query.list
+      }
+    }
+
     def createItem(item: Item): Item = {
       val now = new Timestamp(new Date().getTime)
       Database.forDataSource(dataSource) withSession {
