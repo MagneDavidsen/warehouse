@@ -7,27 +7,50 @@
 <script>
     var b64img;
 
+    function findMaxHeightWidth(img){
+        var MAX_WIDTH = 500;
+        var MAX_HEIGHT = 500;
+        var width = img.width;
+        var height = img.height;
+
+        if (width > height) {
+            if (width > MAX_WIDTH) {
+                height *= MAX_WIDTH / width;
+                width = MAX_WIDTH;
+            }
+        } else {
+            if (height > MAX_HEIGHT) {
+                width *= MAX_HEIGHT / height;
+                height = MAX_HEIGHT;
+            }
+        }
+
+        return {height: height, width: width}
+    }
+
 
     function uploadPicture(){
-
         var preview = document.getElementById('preview');
         var canvas = document.createElement("canvas");
         var selected_file = document.getElementById('cameraInput').files[0];
-
-        console.log(selected_file);
         var img = document.createElement("img");
-        img.src = window.URL.createObjectURL(selected_file);
-        preview.appendChild(img);
-
-        console.log(window.URL.createObjectURL(selected_file));
-
         var reader = new FileReader();
 
         reader.onload = function(evt) {
-            b64img = window.btoa(evt.target.result);
+            img.src = evt.target.result;
+            var heightWidth = findMaxHeightWidth(img);
+
+            canvas.height = heightWidth.height;
+            canvas.width = heightWidth.width;
+
+            var ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            preview.appendChild(canvas);
+            b64img = canvas.toDataURL("image/jpeg", 0.5);
         };
 
-        reader.readAsBinaryString(selected_file);
+        reader.readAsDataURL(selected_file);
     }
 
     function sendToServer() {
@@ -50,7 +73,6 @@
 
 
 </script>
-
 
 <form>
     <input type='text' name='rapperName'/>

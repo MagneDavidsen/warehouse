@@ -16,7 +16,7 @@
 
                     data.forEach(function(item) {
                         var img = document.createElement("img");
-                        img.src = "data:image/png;base64," + item.picture;
+                        img.src = item.picture;
                         img.style.width = "100%";
                         preview.appendChild(img);
                     });
@@ -27,16 +27,9 @@
                 });
     }
 
-
 </script>
 
-
-
-
-
 <div id="preview"></div>
-
-
 
 </body>
 </html>
