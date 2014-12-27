@@ -36,11 +36,13 @@
         var img = document.createElement("img");
         var reader = new FileReader();
 
-        alert("yo");
+
 
         reader.onload = function(evt) {
 
-            img.src = evt.target.result;
+            alert("yo");
+
+            img.src = reader.result;
             var heightWidth = findMaxHeightWidth(img);
 
             canvas.height = heightWidth.height;
