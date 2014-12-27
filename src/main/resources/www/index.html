@@ -36,7 +36,10 @@
         var img = document.createElement("img");
         var reader = new FileReader();
 
+        alert("yo");
+
         reader.onload = function(evt) {
+
             img.src = evt.target.result;
             var heightWidth = findMaxHeightWidth(img);
 
@@ -51,6 +54,7 @@
         };
 
         reader.readAsDataURL(selected_file);
+
     }
 
     function sendToServer() {
@@ -75,7 +79,6 @@
 </script>
 
 <form>
-    <input type='text' name='rapperName'/>
     <input type="file" capture="camera" accept="image/*" id="cameraInput" name="cameraInput" onchange="uploadPicture()">
     <input type='button' value="Last opp"  onclick="sendToServer()"/>
 </form>
