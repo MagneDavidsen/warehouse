@@ -14,7 +14,8 @@
     var reader;
 
 
-    window.document.onload = function(e){
+    window.onload = function(e){
+
         preview = document.getElementById('preview');
         canvas = document.createElement("canvas");
         img = document.createElement("img");
@@ -22,7 +23,7 @@
 
         reader.onload = function(evt) {
 
-            alert("yo");
+            alert("yo 2");
 
             img.src = reader.result;
             var heightWidth = findMaxHeightWidth(img);
