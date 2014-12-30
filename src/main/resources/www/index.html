@@ -5,7 +5,40 @@
 <script src="lib/qwest.min.js"></script>
 
 <script>
+
     var b64img;
+    var preview;
+    var canvas;
+    var selected_file;
+    var img;
+    var reader;
+
+
+    window.document.onload = function(e){
+        preview = document.getElementById('preview');
+        canvas = document.createElement("canvas");
+        img = document.createElement("img");
+        reader = new FileReader();
+
+        reader.onload = function(evt) {
+
+            alert("yo");
+
+            img.src = reader.result;
+            var heightWidth = findMaxHeightWidth(img);
+
+            canvas.height = heightWidth.height;
+            canvas.width = heightWidth.width;
+
+            var ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            preview.appendChild(canvas);
+            b64img = canvas.toDataURL("image/jpeg", 0.5);
+        };
+    }
+
+
 
     function findMaxHeightWidth(img){
         var MAX_WIDTH = 500;
@@ -30,33 +63,8 @@
 
 
     function uploadPicture(){
-        var preview = document.getElementById('preview');
-        var canvas = document.createElement("canvas");
-        var selected_file = document.getElementById('cameraInput').files[0];
-        var img = document.createElement("img");
-        var reader = new FileReader();
-
-
-
-        reader.onload = function(evt) {
-
-            alert("yo");
-
-            img.src = reader.result;
-            var heightWidth = findMaxHeightWidth(img);
-
-            canvas.height = heightWidth.height;
-            canvas.width = heightWidth.width;
-
-            var ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-            preview.appendChild(canvas);
-            b64img = canvas.toDataURL("image/jpeg", 0.5);
-        };
-
+        selected_file = document.getElementById('cameraInput').files[0];
         reader.readAsDataURL(selected_file);
-
     }
 
     function sendToServer() {
@@ -87,8 +95,6 @@
 
 
 <div id="preview"></div>
-
-
 
 </body>
 </html>
