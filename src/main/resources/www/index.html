@@ -5,7 +5,6 @@
 <script src="lib/qwest.min.js"></script>
 
 <script>
-
     var b64img;
     var preview;
     var canvas;
@@ -13,18 +12,17 @@
     var img;
     var reader;
     var docFragment;
-    
+
     window.onload = function(){
+
         preview = document.getElementById('preview');
         canvas = document.createElement("canvas");
-        preview.appendChild(canvas);
-
         img = document.createElement("img");
         docFragment = document.createDocumentFragment();
-        docFragment.appendChild(img);
-
         reader = new FileReader();
+
         reader.onload = function(evt) {
+            docFragment.appendChild(img);
             img.src = reader.result;
 
             var heightWidth = findMaxHeightWidth(img);
@@ -35,11 +33,10 @@
             var ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
+            preview.appendChild(canvas);
             b64img = canvas.toDataURL("image/jpeg", 0.5);
         };
     }
-
-
 
     function findMaxHeightWidth(img){
         var MAX_WIDTH = 500;
@@ -86,14 +83,12 @@
                 });
     }
 
-
 </script>
 
 <form>
     <input type="file" capture="camera" accept="image/*" id="cameraInput" name="cameraInput" onchange="uploadPicture()">
     <input type='button' value="Last opp"  onclick="sendToServer()"/>
 </form>
-
 
 <div id="preview"></div>
 
