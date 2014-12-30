@@ -12,20 +12,21 @@
     var selected_file;
     var img;
     var reader;
-
-
-    window.onload = function(e){
-
+    var docFragment;
+    
+    window.onload = function(){
         preview = document.getElementById('preview');
         canvas = document.createElement("canvas");
+        preview.appendChild(canvas);
+
         img = document.createElement("img");
+        docFragment = document.createDocumentFragment();
+        docFragment.appendChild(img);
+
         reader = new FileReader();
-
         reader.onload = function(evt) {
-
-            alert("yo 2");
-
             img.src = reader.result;
+
             var heightWidth = findMaxHeightWidth(img);
 
             canvas.height = heightWidth.height;
@@ -34,7 +35,6 @@
             var ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-            preview.appendChild(canvas);
             b64img = canvas.toDataURL("image/jpeg", 0.5);
         };
     }
