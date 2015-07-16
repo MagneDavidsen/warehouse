@@ -10,8 +10,8 @@
     var canvas;
     var selected_file;
     var img;
-    var reader;
-    var docFragment;
+    var reader = new FileReader();
+    var docFragment = document.createDocumentFragment();
 
     function findMaxHeightWidth(img){
         var MAX_WIDTH = 500;
@@ -34,22 +34,23 @@
         return {height: height, width: width}
     }
 
-    window.onload = function(){
 
-        preview = document.getElementById('preview');
-        canvas = document.createElement("canvas");
-        img = document.createElement("img");
-        docFragment = document.createDocumentFragment();
-        reader = new FileReader();
+
+
 
         reader.onload = function(evt) {
-            docFragment.appendChild(img);
+
+            preview = document.getElementById("preview");
+            canvas = document.createElement("canvas");
+            img = document.createElement("img");
+
             img.src = reader.result;
+            docFragment.appendChild(img);
 
-            var heightWidth = findMaxHeightWidth(img);
+            //var heightWidth = findMaxHeightWidth(img);
 
-            canvas.height = heightWidth.height;
-            canvas.width = heightWidth.width;
+            canvas.height = 500;
+            canvas.width = 500;
 
             var ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
@@ -57,7 +58,7 @@
             preview.appendChild(canvas);
             b64img = canvas.toDataURL("image/jpeg", 0.5);
         };
-    }
+
 
 
 
